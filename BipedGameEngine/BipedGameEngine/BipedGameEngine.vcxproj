@@ -76,6 +76,7 @@
     <LibraryPath>$(SolutionDir)DirectXTK\Lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)BipedGameEngine_Build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)BipedGameEngine_Build\$(Platform)\$(Configuration)\Bin\</IntDir>
+    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -83,6 +84,7 @@
     <LibraryPath>$(SolutionDir)DirectXTK\Lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)BipedGameEngine_Build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)BipedGameEngine_Build\$(Platform)\$(Configuration)\Bin\</IntDir>
+    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -90,6 +92,7 @@
     <LibraryPath>$(SolutionDir)DirectXTK\Lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)BipedGameEngine_Build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)BipedGameEngine_Build\$(Platform)\$(Configuration)\Bin\</IntDir>
+    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -97,6 +100,7 @@
     <LibraryPath>$(SolutionDir)DirectXTK\Lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)BipedGameEngine_Build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)BipedGameEngine_Build\$(Platform)\$(Configuration)\Bin\</IntDir>
+    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -110,6 +114,9 @@
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy "$(ProjectDir)Assets\*.*" "$(OutDir)Assets\" /Y /I /E </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -123,6 +130,9 @@
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy "$(ProjectDir)Assets\*.*" "$(OutDir)Assets\" /Y /I /E </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -140,6 +150,9 @@
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy "$(ProjectDir)Assets\*.*" "$(OutDir)Assets\" /Y /I /E </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -157,6 +170,9 @@
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy "$(ProjectDir)Assets\*.*" "$(OutDir)Assets\" /Y /I /E </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="engine\Direct3D.cpp" />
@@ -175,6 +191,9 @@
     <ClInclude Include="engine\Time.h" />
     <ClInclude Include="engine\Window.h" />
     <ClInclude Include="engine\System.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\CopyAssets.cmd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

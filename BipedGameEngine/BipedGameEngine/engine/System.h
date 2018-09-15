@@ -10,7 +10,7 @@ namespace bpd{
 
 		bool Initialize(HINSTANCE hInstance);
 		void Shutdown();
-		void Update(int deltaTime);
+		void Update(double deltaTime);
 		void Render();
 		int MessageLoop();
 

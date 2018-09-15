@@ -20,6 +20,9 @@
 #pragma comment (lib, "DirectXTK.lib")
 #pragma comment (lib, "d3dcompiler.lib")
 
+// CBuffers
+#include "core/Buffers.h"
+
 #define SAFE_SHUTDOWN(x)	\
 if (x != nullptr){			\
 	x->Shutdown();			\
@@ -50,7 +53,7 @@ namespace bpd{
 			HWND hwnd
 		);
 
-		void Update(int deltaTime);
+		void Update(double deltaTime);
 		void Render();
 		void Shutdown();
 
@@ -62,6 +65,19 @@ namespace bpd{
 		HRESULT CreateRenderTarget();
 
 	private:
+		bool CreateViewPort(int width, int height);
+		bool CreateCBuffer();
+		bool CreateSampleState();
+
+	public:
+		bool wireframe;
+		bool fullscreen;
+		bool vsync;
+
+	private:
+		// hResult
+		HRESULT					result;
+
 		// SwapChain and Devices
 		IDXGISwapChain			* SwapChain;
 		ID3D11Device			* d3d11Device;

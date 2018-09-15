@@ -40,6 +40,8 @@ bool System::Initialize(HINSTANCE hInstance){
 
 	MessageLoop();
 	Shutdown();
+
+	return true;
 }
 
 int System::MessageLoop() {
@@ -79,7 +81,7 @@ void System::Shutdown(){
 	SAFE_DELETE(window);
 }
 
-void System::Update(int deltaTime){
+void System::Update(double deltaTime){
 	direct3D->Update(deltaTime);
 }
 
