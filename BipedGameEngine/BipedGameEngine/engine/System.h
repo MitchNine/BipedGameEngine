@@ -1,6 +1,7 @@
 #pragma once
 #include "Window.h"
 #include "Direct3D.h"
+#include "Shader.h"
 
 namespace bpd{
 	class System {
@@ -21,6 +22,7 @@ namespace bpd{
 	private:
 		Window		* window;
 		Direct3D	* direct3D;
+		Shader		* shader;
 
 		bpd::Time* time;
 		int frameCount,fps;

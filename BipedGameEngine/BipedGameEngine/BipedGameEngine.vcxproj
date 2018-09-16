@@ -175,6 +175,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\core\pch.cpp" />
     <ClCompile Include="engine\Direct3D.cpp" />
     <ClCompile Include="engine\core\ErrorLogger.cpp" />
     <ClCompile Include="engine\Time.cpp" />
@@ -182,15 +183,18 @@
     <ClCompile Include="engine\core\StringConverter.cpp" />
     <ClCompile Include="engine\Window.cpp" />
     <ClCompile Include="engine\System.cpp" />
+    <ClCompile Include="Engine\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="engine\core\Buffers.h" />
+    <ClInclude Include="Engine\core\Buffers.h" />
+    <ClInclude Include="Engine\core\pch.h" />
     <ClInclude Include="engine\Direct3D.h" />
     <ClInclude Include="engine\core\StringConverter.h" />
     <ClInclude Include="engine\core\ErrorLogger.h" />
     <ClInclude Include="engine\Time.h" />
     <ClInclude Include="engine\Window.h" />
     <ClInclude Include="engine\System.h" />
+    <ClInclude Include="Engine\Shader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\CopyAssets.cmd" />

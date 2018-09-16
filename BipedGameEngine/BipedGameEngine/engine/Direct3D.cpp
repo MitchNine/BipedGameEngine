@@ -12,12 +12,6 @@ Direct3D::Direct3D() {
 	depthStencilView	= 0;
 	depthStencilBuffer	= 0;
 
-	// Vertex and Pixel shaders
-	VS					= 0;
-	PS					= 0;
-	VS_Buffer			= 0;
-	PS_Buffer			= 0;
-
 	// Rasterizer States
 	CCWcullMode			= 0;
 	CWcullMode			= 0;
@@ -34,9 +28,6 @@ Direct3D::Direct3D() {
 	// BackBuffer
 	BackBuffer11		= 0;
 
-	// Layout
-	vertLayout			= 0;
-
 	// flags
 	wireframe			= false;
 	fullscreen			= false;
@@ -50,6 +41,9 @@ bool Direct3D::Initialize(
 	int height,
 	HWND hwnd
 ){
+	this->width		= width;
+	this->height	= height;
+
 	// Describe our SwapChain Buffer
 	DXGI_MODE_DESC bufferDesc;
 	ZeroMemory(&bufferDesc,sizeof(DXGI_MODE_DESC));
@@ -84,8 +78,8 @@ bool Direct3D::Initialize(
 
 	// Describe our Depth/Stencil Buffer
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
-	depthStencilDesc.Width				= width;
-	depthStencilDesc.Height				= height;
+	depthStencilDesc.Width				= this->width;
+	depthStencilDesc.Height				= this->height;
 	depthStencilDesc.MipLevels			= 1;
 	depthStencilDesc.ArraySize			= 1;
 	depthStencilDesc.Format				= DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -106,6 +100,13 @@ bool Direct3D::Initialize(
 	return true;
 }
 
+bool Direct3D::InitializeBuffers(){
+	if (!CreateViewPort())		return false;
+	if (!CreateCBuffer())		return false;
+	if (!CreateSampleState())	return false;
+	return true;
+}
+
 void Direct3D::Shutdown(){
 	// Exit fullscreen
 	SwapChain->SetFullscreenState(false,NULL);
@@ -119,12 +120,6 @@ void Direct3D::Shutdown(){
 	SAFE_RELESE(renderTargetView);
 	SAFE_RELESE(depthStencilView);
 	SAFE_RELESE(depthStencilBuffer);
-
-	// Vertex and Pixel shaders
-	SAFE_RELESE(VS);
-	SAFE_RELESE(PS);
-	SAFE_RELESE(VS_Buffer);
-	SAFE_RELESE(PS_Buffer);
 
 	// Rasterizer States
 	SAFE_RELESE(CCWcullMode);
@@ -141,17 +136,31 @@ void Direct3D::Shutdown(){
 
 	// BackBuffer
 	SAFE_RELESE(BackBuffer11);
-
-	// Layout
-	SAFE_RELESE(vertLayout);
 }
 
 void Direct3D::Update(double deltaTime){
 	
 }
 
-void Direct3D::Render(){
-	
+void Direct3D::ClearScreen(float bgColor[4]){
+	// Clear our render target and depth/stencil view
+	d3d11DevCon->ClearRenderTargetView(renderTargetView,bgColor);
+	d3d11DevCon->ClearDepthStencilView(depthStencilView,D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,1.0f,0);
+
+	// Set our Render Target
+	d3d11DevCon->OMSetRenderTargets(1,&renderTargetView,depthStencilView);
+
+	// Set the default blend state (no blending) for opaque objects
+	d3d11DevCon->OMSetBlendState(0,0,0xffffffff);
+
+	d3d11DevCon->PSSetSamplers(0,1,&LinearSamplerState);
+	d3d11DevCon->RSSetState(RSCullNone);
+}
+
+void Direct3D::Present(){
+	//Present the back buffer to the screen
+	if (vsync) SwapChain->Present(1,0);
+	else SwapChain->Present(0,0);
 }
 
 HRESULT Direct3D::CleanupRenderTarget(){
@@ -170,13 +179,13 @@ HRESULT Direct3D::CreateRenderTarget(){
 	return result;
 }
 
-bool Direct3D::CreateViewPort(int width,int height){
+bool Direct3D::CreateViewPort(){
 	D3D11_VIEWPORT viewport;
 	ZeroMemory(&viewport,sizeof(D3D11_VIEWPORT));
 	viewport.TopLeftX	= 0;
 	viewport.TopLeftY	= 0;
-	viewport.Width		= (FLOAT)width;
-	viewport.Height		= (FLOAT)height;
+	viewport.Width		= (FLOAT)this->width;
+	viewport.Height		= (FLOAT)this->height;
 	viewport.MinDepth	= 0.0f;
 	viewport.MaxDepth	= 1.0f;
 

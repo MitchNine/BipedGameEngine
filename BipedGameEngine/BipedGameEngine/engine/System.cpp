@@ -9,6 +9,7 @@ System::System() {
 	time		= new bpd::Time;
 	window		= new bpd::Window;
 	direct3D	= new bpd::Direct3D;
+	shader		= new bpd::Shader;
 }
 System::~System() {}
 
@@ -25,6 +26,11 @@ bool System::Initialize(HINSTANCE hInstance){
 		return false;
 	}
 
+	// DirectX 11 setup
+	direct3D->fullscreen	= false;
+	direct3D->vsync			= true;
+	direct3D->wireframe		= false;
+
 	// Initialize DirectX 11
 	if(!direct3D->Initialize(
 		hInstance,
@@ -33,6 +39,36 @@ bool System::Initialize(HINSTANCE hInstance){
 		window->GetHWND()
 	)){
 		ErrorLogger::Log("Failed to initialize DirectX");
+		return false;
+	}
+
+	// Shader layout
+	D3D11_INPUT_ELEMENT_DESC layout[] =
+	{
+		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,	0, 12,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TANGENT",	0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32,	D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	};
+
+	// Initialize shaders
+	if(!shader->Initialize(
+		"assets\\shaders\\Effects.fx",
+		"VS",
+		"assets\\shaders\\Effects.fx",
+		"PS",
+		ARRAYSIZE(layout),
+		layout,
+		direct3D->GetDevice(),
+		direct3D->GetDeviceContext()
+	)) {
+		ErrorLogger::Log("Failed to initialize the shader");
+		return false;
+	}
+
+	// Initialize the rest of directX
+	if (!direct3D->InitializeBuffers()){
+		ErrorLogger::Log("Failed to initialize DirectX buffers");
 		return false;
 	}
 
@@ -78,6 +114,7 @@ int System::MessageLoop() {
 
 void System::Shutdown(){
 	SAFE_SHUTDOWN(direct3D);
+	SAFE_SHUTDOWN(shader);
 	SAFE_DELETE(window);
 }
 
@@ -86,7 +123,13 @@ void System::Update(double deltaTime){
 }
 
 void System::Render(){
-	direct3D->Render();
+	float color[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
+	direct3D->ClearScreen(color);
+	//shader->SetShader(direct3D->GetDeviceContext());
+
+
+
+	direct3D->Present();
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
@@ -104,6 +147,10 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 			System::instance->GetDirect3D()->CreateRenderTarget();
 		}
 		return 0;
+	case  WM_KEYDOWN:
+		if(wParam == VK_ESCAPE)
+			PostQuitMessage(0);
+		break;
 	case WM_SYSCOMMAND:
 		if((wParam & 0xfff0) == SC_KEYMENU)
 			return 0;

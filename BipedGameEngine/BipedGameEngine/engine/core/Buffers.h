@@ -4,7 +4,6 @@
 using namespace DirectX;
 
 namespace bpd{
-
 	struct Vertex {
 		XMFLOAT3 pos;		// -- 12 -- 12
 		XMFLOAT2 texCoord;	// -- 12 -- 24

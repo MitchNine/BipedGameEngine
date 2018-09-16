@@ -1,44 +1,5 @@
 #pragma once
-#include <vector>
-#include <DXGI.h>
-#include <D2D1.h>
-#include <d3d11.h>
-#include <sstream>
-#include <Windows.h>
-#include <d3dcompiler.h>
-#include <DirectXMath.h>
-#include <WICTextureLoader.h>
-#include <DDSTextureLoader.h>
-
-#pragma comment (lib, "DXGI.lib")
-#pragma comment (lib, "D2D1.lib")
-#pragma comment (lib, "d3d11.lib")
-#pragma comment (lib, "dwrite.lib")
-#pragma comment (lib, "dxguid.lib")
-#pragma comment (lib, "D3D10_1.lib")
-#pragma comment (lib, "dinput8.lib")
-#pragma comment (lib, "DirectXTK.lib")
-#pragma comment (lib, "d3dcompiler.lib")
-
-// CBuffers
-#include "core/Buffers.h"
-
-#define SAFE_SHUTDOWN(x)	\
-if (x != nullptr){			\
-	x->Shutdown();			\
-	delete x;				\
-	x = NULL;				\
-}
-#define SAFE_DELETE(x)		\
-if (x != nullptr){			\
-	delete x;				\
-	x = NULL;				\
-}
-#define SAFE_RELESE(x)		\
-if (x != nullptr){			\
-	x->Release();			\
-	x = NULL;				\
-}
+#include "core/pch.h"
 
 namespace bpd{
 	class Direct3D {
@@ -52,9 +13,11 @@ namespace bpd{
 			int height,
 			HWND hwnd
 		);
+		bool InitializeBuffers();
 
 		void Update(double deltaTime);
-		void Render();
+		void ClearScreen(float bgColor[4]);
+		void Present();
 		void Shutdown();
 
 		inline IDXGISwapChain		* GetSwapChain()		{ return SwapChain; }
@@ -65,7 +28,7 @@ namespace bpd{
 		HRESULT CreateRenderTarget();
 
 	private:
-		bool CreateViewPort(int width, int height);
+		bool CreateViewPort();
 		bool CreateCBuffer();
 		bool CreateSampleState();
 
@@ -75,6 +38,9 @@ namespace bpd{
 		bool vsync;
 
 	private:
+		int width;
+		int height;
+
 		// hResult
 		HRESULT					result;
 
@@ -87,12 +53,6 @@ namespace bpd{
 		ID3D11RenderTargetView	* renderTargetView;
 		ID3D11DepthStencilView	* depthStencilView;
 		ID3D11Texture2D			* depthStencilBuffer;
-
-		// Vertex and Pixel shaders
-		ID3D11VertexShader		* VS;
-		ID3D11PixelShader		* PS;
-		ID3D10Blob				* VS_Buffer;
-		ID3D10Blob				* PS_Buffer;
 
 		// Rasterizer States
 		ID3D11RasterizerState	* CCWcullMode;
@@ -109,8 +69,5 @@ namespace bpd{
 		
 		// BackBuffer
 		ID3D11Texture2D			* BackBuffer11;
-		
-		// Layout
-		ID3D11InputLayout		* vertLayout;
 	};
 }
