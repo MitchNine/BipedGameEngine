@@ -69,6 +69,8 @@ bool Shader::Initialize(
 
 	// Set the Input Layout
 	d3d11DevCon->IASetInputLayout(inputLayout);
+
+	return true;
 }
 
 void Shader::Shutdown(){

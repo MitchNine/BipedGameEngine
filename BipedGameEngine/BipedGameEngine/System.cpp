@@ -6,10 +6,12 @@ System *System::instance = nullptr;
 System::System() {
 	frameCount	= 0;
 	fps			= 0;
+	frameTime	= 0;
 	time		= new bpd::Time;
 	window		= new bpd::Window;
 	direct3D	= new bpd::Direct3D;
 	shader		= new bpd::Shader;
+	scene		= new bpd::Scene;
 }
 System::~System() {}
 
@@ -19,7 +21,7 @@ bool System::Initialize(HINSTANCE hInstance){
 		"BPD_ENGINE_WINDOW",
 		"Biped Game Engine",
 		800,
-		600,
+		800,
 		hInstance
 	)){
 		ErrorLogger::Log("Failed to initialize window");
@@ -28,8 +30,8 @@ bool System::Initialize(HINSTANCE hInstance){
 
 	// DirectX 11 setup
 	direct3D->fullscreen	= false;
+	direct3D->wireframe		= true;
 	direct3D->vsync			= true;
-	direct3D->wireframe		= false;
 
 	// Initialize DirectX 11
 	if(!direct3D->Initialize(
@@ -72,6 +74,11 @@ bool System::Initialize(HINSTANCE hInstance){
 		return false;
 	}
 
+	if (!scene->Initialize(direct3D->GetDeviceContext(), window->GetScreenWidth(), window->GetScreenWidth())) {
+		ErrorLogger::Log("Failed to initialize scene");
+		return false;
+	}
+
 	instance = this;
 
 	MessageLoop();
@@ -109,7 +116,7 @@ int System::MessageLoop() {
 			Render();
 		}
 	}
-	return msg.wParam;
+	return (int)msg.wParam;
 }
 
 void System::Shutdown(){
@@ -120,14 +127,15 @@ void System::Shutdown(){
 
 void System::Update(double deltaTime){
 	direct3D->Update(deltaTime);
+	scene->Update(deltaTime);
 }
 
 void System::Render(){
 	float color[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
 	direct3D->ClearScreen(color);
-	//shader->SetShader(direct3D->GetDeviceContext());
-
-
+	shader->SetShader(direct3D->GetDeviceContext());
+	
+	scene->Render();
 
 	direct3D->Present();
 }

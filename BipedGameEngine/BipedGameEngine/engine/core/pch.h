@@ -40,3 +40,8 @@ if (x != nullptr){			\
 	x->Release();			\
 	x = NULL;				\
 }
+#define SAFE_ARRAY_DELETE(x)\
+if (x != nullptr){			\
+	delete[] x;				\
+	x = NULL;				\
+}
