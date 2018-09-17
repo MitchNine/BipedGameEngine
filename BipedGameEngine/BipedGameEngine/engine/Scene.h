@@ -1,5 +1,6 @@
 #pragma once
 #include "core\pch.h"
+#include "Object.h"
 #include <Model.h>
 #include <SimpleMath.h>
 #include <GeometricPrimitive.h>
@@ -10,20 +11,14 @@ namespace bpd {
 		Scene();
 		~Scene();
 
-		bool Initialize(ID3D11DeviceContext * d3d11DevCon, int width, int height);
+		bool Initialize(ID3D11DeviceContext * d3d11DevCon, int width, int height, ID3D11Device * d3d11Dev);
 		bool AddModel(std::string path);
 		void Render();
-		void Update(float td);
+		void Update(double td);
 		void Shutdown();
 
 	private:
-		std::vector<Model> models;
-
-		DirectX::SimpleMath::Matrix m_world;
-		DirectX::SimpleMath::Matrix m_view;
-		DirectX::SimpleMath::Matrix m_proj;
-		std::unique_ptr<DirectX::GeometricPrimitive> m_shape;
-
+		std::vector<Object*> objects;
 		float timer;
 	};
 }

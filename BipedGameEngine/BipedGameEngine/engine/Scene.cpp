@@ -4,20 +4,16 @@ using namespace bpd;
 using namespace DirectX::SimpleMath;
 
 Scene::Scene() {
-	models = std::vector<Model>();
+	objects = std::vector<Object*>();
 	timer = 0;
 }
 Scene::~Scene() {}
 
-bool Scene::Initialize(ID3D11DeviceContext * d3d11DevCon, int width, int height) {
-	m_shape = GeometricPrimitive::CreateTorus(d3d11DevCon);
-
-	m_world = Matrix::Identity;
-
-	m_view = Matrix::CreateLookAt(Vector3(2.f, 2.f, 2.f),
-		Vector3::Zero, Vector3::UnitY);
-	m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f,
-		float(width) / float(height), 0.1f, 10.f);
+bool Scene::Initialize(ID3D11DeviceContext * d3d11DevCon, int width, int height, ID3D11Device * d3d11Dev) {
+	Object* obj = new Object();
+	objects.push_back(obj);
+	objects.back()->Initialize(Object::PRIMITIVE_OBJ::Sphere, d3d11DevCon, width, height);
+	
 	return true;
 }
 
@@ -27,15 +23,15 @@ bool Scene::AddModel(std::string path) {
 }
 
 void Scene::Render() {
-	m_shape->Draw(m_world, m_view, m_proj);
+	for (int i = 0; i < objects.size(); i++)
+		objects[i]->Render();
 }
 
-void Scene::Update(float td) {
+void Scene::Update(double td) {
 	timer += 0.01f;
-	m_world = Matrix::CreateRotationZ(2.f + timer);
 }
 
 void Scene::Shutdown() {
-	models.clear();
-	m_shape.reset();
+	for (int i = 0; i < objects.size(); i++)
+		objects[i]->Shutdown();
 }

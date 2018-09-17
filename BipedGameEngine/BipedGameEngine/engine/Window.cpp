@@ -35,18 +35,18 @@ bool Window::Initialize(
 bool Window::bpd_RegisterWindow( HINSTANCE hInstance ){
 	WNDCLASSEX wc;
 
-	wc.cbSize = sizeof(WNDCLASSEX);
-	wc.style = CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = WndProc;
-	wc.cbClsExtra = NULL;
-	wc.cbWndExtra = NULL;
-	wc.hInstance = hInstance;
-	wc.hIcon = LoadIcon(NULL,IDI_APPLICATION);
-	wc.hCursor = LoadCursor(NULL,IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wc.lpszMenuName = NULL;
-	wc.lpszClassName = window_class.c_str();
-	wc.hIconSm = LoadIcon(NULL,IDI_APPLICATION);
+	wc.cbSize			= sizeof(WNDCLASSEX);
+	wc.style			= CS_HREDRAW | CS_VREDRAW;
+	wc.lpfnWndProc		= WndProc;
+	wc.cbClsExtra		= NULL;
+	wc.cbWndExtra		= NULL;
+	wc.hInstance		= hInstance;
+	wc.hIcon			= LoadIcon(NULL,IDI_APPLICATION);
+	wc.hCursor			= LoadCursor(NULL,IDC_ARROW);
+	wc.hbrBackground	= (HBRUSH)(COLOR_WINDOW + 1);
+	wc.lpszMenuName		= NULL;
+	wc.lpszClassName	= window_class.c_str();
+	wc.hIconSm			= LoadIcon(NULL,IDI_APPLICATION);
 
 	if(!RegisterClassEx(&wc)) {
 		ErrorLogger::Log("Failed to register class");

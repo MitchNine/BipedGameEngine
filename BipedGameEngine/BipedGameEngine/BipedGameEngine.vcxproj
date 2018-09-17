@@ -178,6 +178,7 @@
     <ClCompile Include="Engine\core\pch.cpp" />
     <ClCompile Include="engine\Direct3D.cpp" />
     <ClCompile Include="engine\core\ErrorLogger.cpp" />
+    <ClCompile Include="engine\Object.cpp" />
     <ClCompile Include="engine\Time.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="engine\core\StringConverter.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="engine\Direct3D.h" />
     <ClInclude Include="engine\core\StringConverter.h" />
     <ClInclude Include="engine\core\ErrorLogger.h" />
+    <ClInclude Include="engine\Object.h" />
     <ClInclude Include="engine\Time.h" />
     <ClInclude Include="engine\Window.h" />
     <ClInclude Include="engine\Scene.h" />

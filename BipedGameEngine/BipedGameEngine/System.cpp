@@ -74,7 +74,7 @@ bool System::Initialize(HINSTANCE hInstance){
 		return false;
 	}
 
-	if (!scene->Initialize(direct3D->GetDeviceContext(), window->GetScreenWidth(), window->GetScreenWidth())) {
+	if (!scene->Initialize(direct3D->GetDeviceContext(), window->GetScreenWidth(), window->GetScreenWidth(), direct3D->GetDevice())) {
 		ErrorLogger::Log("Failed to initialize scene");
 		return false;
 	}
