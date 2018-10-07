@@ -25,6 +25,8 @@ namespace bpd{
 		Direct3D	* direct3D;
 		Shader		* shader;
 		Scene		* scene;
+		Camera		* cam;
+		cbPerObject cbPerObj;
 
 		bpd::Time* time;
 		int frameCount,fps;

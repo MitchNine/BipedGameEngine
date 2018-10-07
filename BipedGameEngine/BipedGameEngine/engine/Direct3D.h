@@ -20,9 +20,15 @@ namespace bpd{
 		void Present();
 		void Shutdown();
 
-		inline IDXGISwapChain		* GetSwapChain()		{ return SwapChain; }
-		inline ID3D11Device			* GetDevice()			{ return d3d11Device; }
-		inline ID3D11DeviceContext	* GetDeviceContext()	{ return d3d11DevCon; }
+		inline IDXGISwapChain		* GetSwapChain()			{ return SwapChain; }
+		inline ID3D11Device			* GetDevice()				{ return d3d11Device; }
+		inline ID3D11DeviceContext	* GetDeviceContext()		{ return d3d11DevCon; }
+		inline ID3D11Buffer			* GetCBPerObjectBuffer()	{ return cbPerObjectBuffer; }
+		inline ID3D11Buffer			* GetCBPerFrameBuffer()		{ return cbPerFrameBuffer; }
+
+		inline bpd::cbPerObject		GetCBPerObject()			{ return cbPerObj; }
+		inline bpd::cbPerFrame		GetCBPerFrame()				{ return constbuffPerFrame; }
+
 
 		HRESULT CleanupRenderTarget();
 		HRESULT CreateRenderTarget();
@@ -68,6 +74,10 @@ namespace bpd{
 		ID3D11Buffer			* cbPerFrameBuffer;
 		
 		// BackBuffer
-		ID3D11Texture2D			* BackBuffer11;
+		ID3D11Texture2D			* BackBuffer;
+
+		bpd::Light light;
+		bpd::cbPerObject cbPerObj;
+		bpd::cbPerFrame constbuffPerFrame;
 	};
 }

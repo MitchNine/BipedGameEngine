@@ -1,0 +1,97 @@
+#pragma once
+#include "core\pch.h"
+#include "Camera.h"
+#include <fstream>
+#include <istream>
+
+namespace bpd {
+	struct TextureManager {
+		std::vector<ID3D11ShaderResourceView*> TextureList;
+		std::vector<std::wstring> TextureNameArray;     // So we don't load in the same texture twice
+	};
+
+	struct SurfaceMaterial {
+		std::wstring MatName;   // So we can match the subset with it's material
+		XMFLOAT4 Diffuse;		// Surface's colors
+		XMFLOAT3 Ambient;		// Transparency (Alpha) stored in 4th component
+		XMFLOAT4 Specular;      // Specular power stored in 4th component
+
+		// Texture ID's to look up texture in SRV array
+		int DiffuseTextureID;
+		int AmbientTextureID;
+		int SpecularTextureID;
+		int AlphaTextureID;
+		int NormMapTextureID;
+
+		// Booleans so we don't implement techniques we don't need
+		bool HasDiffTexture;
+		bool HasAmbientTexture;
+		bool HasSpecularTexture;
+		bool HasAlphaTexture;
+		bool HasNormMap;
+		bool IsTransparent;
+	};
+	struct ObjModel {
+		int Subsets = 0;                    // Number of subsets in obj model
+		XMMATRIX World = XMMATRIX();        // Models world matrix
+		ID3D11Buffer* VertBuff;             // Models vertex buffer
+		ID3D11Buffer* IndexBuff;            // Models index buffer
+		std::vector<int> SubsetIndexStart;  // Subset's index offset
+		std::vector<int> SubsetMaterialID;  // Lookup ID for subsets surface material
+		std::vector<DWORD> Indices;         // Models index list
+		std::vector<XMFLOAT3> Vertices;     // Models vertex positions list
+		std::vector<XMFLOAT3> AABB;			// Stores models AABB (min vertex, max vertex, and center)
+											// Where AABB[0] is the min Vertex, and AABB[1] is the max vertex
+		XMFLOAT3 Center;					// True center of the model
+		float BoundingSphere;				// Model's bounding sphere
+	};
+	struct Transform {
+		XMMATRIX MRotation;					// Rotation Matrix
+		XMMATRIX MScale;					// Scale Matrix
+		XMMATRIX MTranslation;				// Translation Matrix
+
+		XMFLOAT3 position;					// Vector3 to translate the Translation Matrix
+		XMFLOAT3 scail;						// Vector3 to scail the Scale Matrix
+		XMFLOAT3 rotation;					// Vector3 to rotate the Rotation Matrix
+	};
+
+	class Model {
+	public:
+		Model();
+		~Model();
+
+		bool Initialize();
+		void Render(
+			ID3D11DeviceContext* DevCon,		// Pointer to the device
+			Camera* cam,						// Pointer to the camera
+			UINT stride,						// stride of the vertex
+			UINT offset,						// offset of the vertex
+			ID3D11Buffer* cbPerObjectBuffer,	// Pointer to the per object buffer
+			cbPerObject& cbPerObj				// Reference to the pre object struct
+		);
+		void Update();
+		void Shutdown();
+
+		HRESULT CreateTexture(
+			ID3D11Device* device,				// Pointer to the device
+			const WCHAR* filename,				// shader filename (Effects.fx)
+			ID3D11ShaderResourceView **texture	// Pointer to the shader resource
+		);
+
+		bool LoadObjModel(
+			ID3D11Device** device,		// Pointer to the device
+			std::wstring path,			// object path
+			std::wstring Filename,      // obj m_model filename (m_model.obj)
+			IDXGISwapChain** SwapChain,	// Pointer to the swap chain
+			bool IsRHCoordSys,          // True if m_model was created in right hand coord system
+			bool ComputeNormals			// True to compute the normals, false to use the files normals
+		);
+
+		Transform						transform;
+	private:
+		std::vector<SurfaceMaterial>	material;
+		TextureManager					textureMgr;
+		ObjModel						model;
+	};
+
+}

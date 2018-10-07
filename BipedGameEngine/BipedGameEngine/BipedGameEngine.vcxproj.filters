@@ -45,7 +45,10 @@
     <ClCompile Include="engine\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Object.cpp">
+    <ClCompile Include="engine\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,11 +83,15 @@
     <ClInclude Include="engine\Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Object.h">
+    <ClInclude Include="engine\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\CopyAssets.cmd" />
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

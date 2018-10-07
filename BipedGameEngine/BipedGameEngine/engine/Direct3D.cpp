@@ -26,7 +26,7 @@ Direct3D::Direct3D() {
 	cbPerFrameBuffer	= 0;
 
 	// BackBuffer
-	BackBuffer11		= 0;
+	BackBuffer		= 0;
 
 	// flags
 	wireframe			= false;
@@ -97,6 +97,18 @@ bool Direct3D::Initialize(
 	result = d3d11Device->CreateDepthStencilView(depthStencilBuffer,NULL,&depthStencilView);
 	if(FAILED(result)) return false;
 
+	if(!CreateViewPort())		return false;
+	if(!CreateCBuffer())		return false;
+	if(!CreateSampleState())	return false;
+
+	light.pos = XMFLOAT3(0.0f,7.0f,0.0f);
+	light.dir = XMFLOAT3(0.5f,0.75f,-0.5f);
+	light.range = 1000.0f;
+	light.cone = 12.0f;
+	light.att = XMFLOAT3(0.4f,0.02f,0.000f);
+	light.ambient = XMFLOAT4(0.2f,0.2f,0.2f,1.0f);
+	light.diffuse = XMFLOAT4(1.0f,1.0f,1.0f,1.0f);
+
 	return true;
 }
 
@@ -135,7 +147,7 @@ void Direct3D::Shutdown(){
 	SAFE_RELESE(cbPerFrameBuffer);
 
 	// BackBuffer
-	SAFE_RELESE(BackBuffer11);
+	SAFE_RELESE(BackBuffer);
 }
 
 void Direct3D::Update(double deltaTime){
@@ -146,6 +158,11 @@ void Direct3D::ClearScreen(float bgColor[4]){
 	// Clear our render target and depth/stencil view
 	d3d11DevCon->ClearRenderTargetView(renderTargetView,bgColor);
 	d3d11DevCon->ClearDepthStencilView(depthStencilView,D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,1.0f,0);
+
+	// Update the cbPerFrame
+	constbuffPerFrame.light = light;
+	d3d11DevCon->UpdateSubresource(cbPerFrameBuffer,0,NULL,&constbuffPerFrame,0,0);
+	d3d11DevCon->PSSetConstantBuffers(0,1,&cbPerFrameBuffer);
 
 	// Set our Render Target
 	d3d11DevCon->OMSetRenderTargets(1,&renderTargetView,depthStencilView);
@@ -170,10 +187,10 @@ HRESULT Direct3D::CleanupRenderTarget(){
 }
 
 HRESULT Direct3D::CreateRenderTarget(){
-	result = SwapChain->GetBuffer(0,__uuidof(ID3D11Texture2D),(void**)&BackBuffer11);
+	result = SwapChain->GetBuffer(0,__uuidof(ID3D11Texture2D),(void**)&BackBuffer);
 	if (FAILED(result)) return result;
 
-	result = d3d11Device->CreateRenderTargetView(BackBuffer11,NULL,&renderTargetView);
+	result = d3d11Device->CreateRenderTargetView(BackBuffer,NULL,&renderTargetView);
 	if(FAILED(result)) return result;
 
 	return result;
@@ -253,6 +270,7 @@ bool Direct3D::CreateSampleState(){
 	if (wireframe)
 		cmdesc.FillMode = D3D11_FILL_WIREFRAME;
 	cmdesc.CullMode		= D3D11_CULL_NONE;
+
 	result = d3d11Device->CreateRasterizerState(&cmdesc,&RSCullNone);
 	if(FAILED(result)) return false;
 
@@ -274,7 +292,8 @@ bool Direct3D::CreateSampleState(){
 	blendDesc.AlphaToCoverageEnable = false;
 	blendDesc.RenderTarget[0]		= rtbd;
 
-	d3d11Device->CreateBlendState(&blendDesc,&Transparency);
+	result = d3d11Device->CreateBlendState(&blendDesc,&Transparency);
+	if(FAILED(result)) return false;
 
 	return true;
 }

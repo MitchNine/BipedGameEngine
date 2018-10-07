@@ -1,9 +1,6 @@
 #pragma once
 #include "core\pch.h"
-#include "Object.h"
-#include <Model.h>
-#include <SimpleMath.h>
-#include <GeometricPrimitive.h>
+#include "Model.h"
 
 namespace bpd {
 	class Scene {
@@ -11,14 +8,26 @@ namespace bpd {
 		Scene();
 		~Scene();
 
-		bool Initialize(ID3D11DeviceContext * d3d11DevCon, int width, int height, ID3D11Device * d3d11Dev);
-		bool AddModel(std::string path);
-		void Render();
-		void Update(double td);
+		bool Initialize();
+		void Render(
+			ID3D11DeviceContext* DevCon,
+			Camera* cam,
+			ID3D11Buffer* cbPerObjectBuffer
+		);
+		void Update(double dt);
 		void Shutdown();
 
+		Model* AddModel(
+			std::string path,
+			ID3D11Device* device,
+			IDXGISwapChain* swapChain
+		);
+		Model* GetModel(int id);
+
 	private:
-		std::vector<Object*> objects;
+		cbPerObject cbPerObj;
+
+		std::vector<Model*> models;
 		float timer;
 	};
 }

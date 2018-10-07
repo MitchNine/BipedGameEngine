@@ -37,15 +37,24 @@ bool Shader::Initialize(
 	ID3D11Device				* d3d11Device,
 	ID3D11DeviceContext			* d3d11DevCon
 ){
+	ID3DBlob *errors;
+
 	// Compile Shaders from shader file
 	result = D3DCompileFromFile(
 		StringConverter::StringToWide(vs_path).c_str(),
-		0,0,vs_entry.c_str(),"vs_4_0",0,0,&VS_Buffer,0);
-	if(FAILED(result)) return false;
+		0,0,vs_entry.c_str(),"vs_4_0",D3DCOMPILE_DEBUG,0,&VS_Buffer,&errors);
+	if(FAILED(result)) {
+		MessageBox(0,(WCHAR *)errors->GetBufferPointer(),L"Error",MB_OK | MB_ICONERROR);
+		return false;
+	}
 
-	result = D3DCompileFromFile(StringConverter::StringToWide(ps_path).c_str(),
-		0,0,ps_entry.c_str(),"ps_4_0",0,0,&PS_Buffer,0);
-	if(FAILED(result)) return false;
+	result = D3DCompileFromFile(
+		StringConverter::StringToWide(ps_path).c_str(),
+		0,0,ps_entry.c_str(),"ps_4_0",D3DCOMPILE_DEBUG,0,&PS_Buffer,&errors);
+	if(FAILED(result)) {
+		MessageBox(0,(WCHAR *)errors->GetBufferPointer(),L"Error",MB_OK | MB_ICONERROR);
+		return false;
+	}
 
 	// Create the Shader Objects
 	result = d3d11Device->CreateVertexShader(VS_Buffer->GetBufferPointer(),VS_Buffer->GetBufferSize(),NULL,&VS);
@@ -69,6 +78,9 @@ bool Shader::Initialize(
 
 	// Set the Input Layout
 	d3d11DevCon->IASetInputLayout(inputLayout);
+
+	// Set Primitive Topology
+	d3d11DevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	return true;
 }

@@ -1,37 +1,70 @@
 #include "Scene.h"
-
 using namespace bpd;
-using namespace DirectX::SimpleMath;
 
 Scene::Scene() {
-	objects = std::vector<Object*>();
+	models = std::vector<Model*>();
 	timer = 0;
 }
 Scene::~Scene() {}
 
-bool Scene::Initialize(ID3D11DeviceContext * d3d11DevCon, int width, int height, ID3D11Device * d3d11Dev) {
-	Object* obj = new Object();
-	objects.push_back(obj);
-	objects.back()->Initialize(Object::PRIMITIVE_OBJ::Sphere, d3d11DevCon, width, height);
-	
+bool Scene::Initialize() {
+
 	return true;
 }
 
-bool Scene::AddModel(std::string path) {
+Model* Scene::AddModel(std::string path, ID3D11Device * device, IDXGISwapChain * swapChain) {
+	Model *m = new Model;
 	
-	return true;
+	std::string dir, name;
+	int i = path.size() - 1;
+	for (; i > 0; i--){
+		if (path[i] == '\\')
+			break;
+	}
+
+	dir = path.substr(0, i + 1);
+	name = path.substr(i + 1,path.size() - 1);
+	m->LoadObjModel(
+		&device,
+		StringConverter::StringToWide(dir),
+		StringConverter::StringToWide(name),
+		&swapChain, true, true
+	);
+
+	models.push_back(m);
+
+	return m;
 }
 
-void Scene::Render() {
-	for (int i = 0; i < objects.size(); i++)
-		objects[i]->Render();
+Model* Scene::GetModel(int id){
+	return models[id];
 }
 
-void Scene::Update(double td) {
+void Scene::Render(
+	ID3D11DeviceContext* DevCon,
+	Camera* cam,
+	ID3D11Buffer* cbPerObjectBuffer
+) {
+	for (int i = 0; i < models.size(); i++)
+		models[i]->Render(
+			DevCon,				// Pointer to the device context
+			cam,				// Pointer to the camera
+			sizeof(bpd::Vertex),// Vertex stride
+			0,					// Vertex offset
+			cbPerObjectBuffer,	// Pointer to the per object buffer
+			cbPerObj			// Reference to the pre object struct
+		);
+}
+
+void Scene::Update(double dt) {
 	timer += 0.01f;
+
+	for(int i = 0; i < models.size(); i++)
+		models[i]->Update();
+
 }
 
 void Scene::Shutdown() {
-	for (int i = 0; i < objects.size(); i++)
-		objects[i]->Shutdown();
+	for(int i = 0; i < models.size(); i++)
+		models[i]->Shutdown();
 }

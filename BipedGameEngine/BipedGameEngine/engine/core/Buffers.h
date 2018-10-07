@@ -6,11 +6,11 @@ using namespace DirectX;
 namespace bpd{
 	struct Vertex {
 		XMFLOAT3 pos;		// -- 12 -- 12
-		XMFLOAT2 texCoord;	// -- 12 -- 24
-		XMFLOAT3 normal;	// -- 12 -- 36
-		XMFLOAT3 tangent;	// -- 12 -- 48
-		XMFLOAT3 biTangent;	// -- 12 -- 60
-		// 60 bytes
+		XMFLOAT2 texCoord;	// -- 8  -- 20
+		XMFLOAT3 normal;	// -- 12 -- 32
+		XMFLOAT3 tangent;	// -- 12 -- 44
+		XMFLOAT3 biTangent;	// -- 12 -- 56
+		// 56 bytes
 	};
 
 	struct Light {
@@ -29,7 +29,7 @@ namespace bpd{
 
 	// use BOOL as its 4 bytes instead of 1
 	struct cbPerObject {
-		XMMATRIX WVP	= XMMATRIX();	// -- 64 -- 0
+		XMMATRIX WVP	= XMMATRIX();	// -- 64 -- 64
 		XMMATRIX World	= XMMATRIX();	// -- 64 -- 128
 		XMFLOAT4 difColor;				// -- 16 -- 144
 		BOOL hasTexture;				// -- 4  -- 148

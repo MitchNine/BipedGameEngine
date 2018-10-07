@@ -72,32 +72,32 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)DirectXTK\Inc\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)DirectXTK\Lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)BipedGameEngine_Build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)BipedGameEngine_Build\$(Platform)\$(Configuration)\Bin\</IntDir>
     <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)DirectXTK\Inc\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)DirectXTK\Lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)BipedGameEngine_Build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)BipedGameEngine_Build\$(Platform)\$(Configuration)\Bin\</IntDir>
     <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)DirectXTK\Inc\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)DirectXTK\Lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)BipedGameEngine_Build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)BipedGameEngine_Build\$(Platform)\$(Configuration)\Bin\</IntDir>
     <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)DirectXTK\Inc\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)DirectXTK\Lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)BipedGameEngine_Build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)BipedGameEngine_Build\$(Platform)\$(Configuration)\Bin\</IntDir>
     <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
@@ -108,6 +108,8 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -124,6 +126,8 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -142,6 +146,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -162,6 +168,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -175,10 +183,11 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Camera.cpp" />
     <ClCompile Include="Engine\core\pch.cpp" />
     <ClCompile Include="engine\Direct3D.cpp" />
     <ClCompile Include="engine\core\ErrorLogger.cpp" />
-    <ClCompile Include="engine\Object.cpp" />
+    <ClCompile Include="engine\Model.cpp" />
     <ClCompile Include="engine\Time.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="engine\core\StringConverter.cpp" />
@@ -188,12 +197,13 @@
     <ClCompile Include="Engine\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Camera.h" />
     <ClInclude Include="Engine\core\Buffers.h" />
     <ClInclude Include="Engine\core\pch.h" />
     <ClInclude Include="engine\Direct3D.h" />
     <ClInclude Include="engine\core\StringConverter.h" />
     <ClInclude Include="engine\core\ErrorLogger.h" />
-    <ClInclude Include="engine\Object.h" />
+    <ClInclude Include="engine\Model.h" />
     <ClInclude Include="engine\Time.h" />
     <ClInclude Include="engine\Window.h" />
     <ClInclude Include="engine\Scene.h" />
@@ -202,8 +212,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\CopyAssets.cmd" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\directxtex_desktop_2015.2018.8.18.2\build\native\directxtex_desktop_2015.targets" Condition="Exists('..\packages\directxtex_desktop_2015.2018.8.18.2\build\native\directxtex_desktop_2015.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\directxtex_desktop_2015.2018.8.18.2\build\native\directxtex_desktop_2015.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtex_desktop_2015.2018.8.18.2\build\native\directxtex_desktop_2015.targets'))" />
+  </Target>
 </Project>
