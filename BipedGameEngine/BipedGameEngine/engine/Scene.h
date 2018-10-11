@@ -25,9 +25,8 @@ namespace bpd {
 		Model* GetModel(int id);
 
 	private:
-		cbPerObject cbPerObj;
-
-		std::vector<Model*> models;
+		cbPerObject				cbPerObj;
+		std::vector<Model*>		models;
 		float timer;
 	};
 }

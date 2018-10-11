@@ -13,6 +13,7 @@ System::System() {
 	shader		= new bpd::Shader;
 	scene		= new bpd::Scene;
 	cam			= new bpd::Camera;
+	input		= new bpd::Input;
 }
 System::~System() {}
 
@@ -42,6 +43,11 @@ bool System::Initialize(HINSTANCE hInstance){
 		window->GetHWND()
 	)){
 		ErrorLogger::Log("Failed to initialize DirectX");
+		return false;
+	}
+
+	if(!input->Initialize(hInstance,window->GetHWND(),window->GetWindowWidth(),window->GetWindowHeight())) {
+		ErrorLogger::Log("Failed to initialize input");
 		return false;
 	}
 
@@ -82,9 +88,9 @@ bool System::Initialize(HINSTANCE hInstance){
 	cam->camView = XMMatrixLookAtLH(cam->camPosition,cam->camTarget,cam->camUp);
 	cam->camProjection = XMMatrixPerspectiveFovLH(0.4f*3.14159f,(float)window->GetWindowWidth() / (float)window->GetWindowHeight(),1.0f,1000.0f);
 
-	// Load up the models
-	Model* rock = scene->AddModel("Assets\\ground\\ground.obj", direct3D->GetDevice(), direct3D->GetSwapChain());
-	rock->transform.position = XMFLOAT3(0, 0, 0);
+	
+	Model* rock = scene->AddModel("Assets\\Rock\\Rock.obj",direct3D->GetDevice(),direct3D->GetSwapChain());
+	rock->transform.position = XMFLOAT3(0,0,0);
 
 	// Set the system instance for static access
 	instance = this;
@@ -123,6 +129,8 @@ int System::MessageLoop() {
 				time->StartTimer();
 			}
 			frameTime = time->GetFrameTime();
+			input->Update();
+
 			Update(frameTime);
 			Render();
 		}
@@ -131,15 +139,67 @@ int System::MessageLoop() {
 }
 
 void System::Shutdown(){
-	SAFE_SHUTDOWN	(direct3D);
 	SAFE_SHUTDOWN	(shader);
+	SAFE_SHUTDOWN	(input);
+	SAFE_SHUTDOWN	(scene);
+
 	SAFE_DELETE		(window);
+	SAFE_DELETE		(time);
+	SAFE_DELETE		(cam);
+
+	SAFE_SHUTDOWN	(direct3D);
 }
 
 void System::Update(double deltaTime){
 	direct3D->Update(deltaTime);
 	scene->Update(deltaTime);
+	
+	if(input->GetKey(DIK_ESCAPE)) {
+		PostMessage(window->GetHWND(),WM_DESTROY,0,0);
+	}
+
+	if(input->GetMouseKey(1)) {
+		float speed = 10.0f * deltaTime;
+		if(input->GetKey(DIK_LSHIFT)) {
+			speed *= 3;
+		}
+
+		if(input->GetKey(DIK_A)) {
+			cam->moveLeftRight -= speed;
+		}
+		if(input->GetKey(DIK_D)) {
+			cam->moveLeftRight += speed;
+		}
+		if(input->GetKey(DIK_W)) {
+			cam->moveBackForward += speed;
+		}
+		if(input->GetKey(DIK_S)) {
+			cam->moveBackForward -= speed;
+		}
+		if(input->GetKey(DIK_SPACE)) {
+			cam->moveDownUp += speed;
+		}
+		if(input->GetKey(DIK_E)) {
+			cam->moveDownUp += speed;
+		}
+		if(input->GetKey(DIK_Q)) {
+			cam->moveDownUp -= speed;
+		}
+
+		input->GetMouseMovement(curr_mouseX,curr_mouseY);
+		if((curr_mouseX != prev_mouseX) || (curr_mouseY != prev_mouseY)) {
+
+			cam->camYaw += curr_mouseX * 0.001f;
+			cam->camPitch += curr_mouseY * 0.001f;
+
+			prev_mouseX = curr_mouseX;
+			prev_mouseY = curr_mouseY;
+		}
+
+	}
+
 	cam->Update();
+
 }
 
 void System::Render(){
@@ -151,13 +211,11 @@ void System::Render(){
 	// Set the shader for the models to use
 	shader->SetShader(direct3D->GetDeviceContext());
 
-	scene->GetModel(0)->Render(direct3D->GetDeviceContext(), cam, 56, 0, direct3D->GetCBPerObjectBuffer(), cbPerObj);
-
 	// Render all the models in the scene
 	scene->Render(
 		direct3D->GetDeviceContext(),
 		cam,
-		direct3D->GetCBPerFrameBuffer()
+		direct3D->GetCBPerObjectBuffer()
 	);
 
 	// pass everything to the GPU

@@ -47,6 +47,8 @@ namespace bpd{
 		int width;
 		int height;
 
+		ID3D11Debug				* pDebug;
+
 		// hResult
 		HRESULT					result;
 
@@ -58,6 +60,7 @@ namespace bpd{
 		// Render and Depth buffers
 		ID3D11RenderTargetView	* renderTargetView;
 		ID3D11DepthStencilView	* depthStencilView;
+		ID3D11DepthStencilState * depthStencilState;
 		ID3D11Texture2D			* depthStencilBuffer;
 
 		// Rasterizer States

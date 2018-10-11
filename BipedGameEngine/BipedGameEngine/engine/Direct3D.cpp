@@ -33,7 +33,9 @@ Direct3D::Direct3D() {
 	fullscreen			= false;
 	vsync				= false;
 }
-Direct3D::~Direct3D() {}
+Direct3D::~Direct3D() {
+	
+}
 
 bool Direct3D::Initialize(
 	HINSTANCE hInstance,
@@ -59,43 +61,96 @@ bool Direct3D::Initialize(
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 	ZeroMemory(&swapChainDesc,sizeof(DXGI_SWAP_CHAIN_DESC));
 	swapChainDesc.BufferDesc			= bufferDesc;
-	swapChainDesc.SampleDesc.Count		= 1;
+	swapChainDesc.SampleDesc.Count		= 4;
 	swapChainDesc.SampleDesc.Quality	= 0;
 	swapChainDesc.BufferUsage			= DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.BufferCount			= 1;
 	swapChainDesc.OutputWindow			= hwnd;
 	swapChainDesc.Windowed				= !fullscreen;
 	swapChainDesc.SwapEffect			= DXGI_SWAP_EFFECT_DISCARD;
+	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	D3D_FEATURE_LEVEL featureD11_1 = D3D_FEATURE_LEVEL_11_1;
+	D3D_FEATURE_LEVEL featureD11_0 = D3D_FEATURE_LEVEL_11_0;
+	D3D_FEATURE_LEVEL featureD10_1 = D3D_FEATURE_LEVEL_10_1;
+	D3D_FEATURE_LEVEL featureD10_0 = D3D_FEATURE_LEVEL_10_0;
+	D3D_FEATURE_LEVEL featureLevels[] = {
+		D3D_FEATURE_LEVEL_11_1,
+		D3D_FEATURE_LEVEL_11_0,
+		D3D_FEATURE_LEVEL_10_1,
+		D3D_FEATURE_LEVEL_10_0,
+	};
+	UINT numFeatureLevels = ARRAYSIZE(featureLevels);
 
 	// Create our Direct3D 11 Device and SwapChain
-	result = D3D11CreateDeviceAndSwapChain(0,D3D_DRIVER_TYPE_HARDWARE,NULL,D3D11_CREATE_DEVICE_BGRA_SUPPORT,
-		NULL,NULL,D3D11_SDK_VERSION,&swapChainDesc,&SwapChain,&d3d11Device,NULL,&d3d11DevCon);
-	if (FAILED(result)) return false;
+	if(FAILED(D3D11CreateDeviceAndSwapChain(NULL,D3D_DRIVER_TYPE_HARDWARE,NULL,D3D11_CREATE_DEVICE_DEBUG,featureLevels,numFeatureLevels,D3D11_SDK_VERSION,&swapChainDesc,&SwapChain,&d3d11Device,&featureD11_1,&d3d11DevCon)))
+		if(FAILED(D3D11CreateDeviceAndSwapChain(NULL,D3D_DRIVER_TYPE_HARDWARE,NULL,D3D11_CREATE_DEVICE_DEBUG,featureLevels,numFeatureLevels,D3D11_SDK_VERSION,&swapChainDesc,&SwapChain,&d3d11Device,&featureD11_0,&d3d11DevCon)))
+			if(FAILED(D3D11CreateDeviceAndSwapChain(NULL,D3D_DRIVER_TYPE_HARDWARE,NULL,D3D11_CREATE_DEVICE_DEBUG,featureLevels,numFeatureLevels,D3D11_SDK_VERSION,&swapChainDesc,&SwapChain,&d3d11Device,&featureD10_1,&d3d11DevCon)))
+				if(FAILED(D3D11CreateDeviceAndSwapChain(NULL,D3D_DRIVER_TYPE_HARDWARE,NULL,D3D11_CREATE_DEVICE_DEBUG,featureLevels,numFeatureLevels,D3D11_SDK_VERSION,&swapChainDesc,&SwapChain,&d3d11Device,&featureD10_0,&d3d11DevCon)))
+					return false;
+
+	if (FAILED(d3d11Device->QueryInterface(IID_PPV_ARGS(&pDebug))))
+		return false;
+
 
 	// Create our BackBuffer and Render Target
-	result = CreateRenderTarget();
-	if(FAILED(result)) return false;
+	if (FAILED(CreateRenderTarget()))
+		return false;
+	
 
-	// Describe our Depth/Stencil Buffer
+	// Describe our Depth Stencil Buffer
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
 	depthStencilDesc.Width				= this->width;
 	depthStencilDesc.Height				= this->height;
 	depthStencilDesc.MipLevels			= 1;
 	depthStencilDesc.ArraySize			= 1;
 	depthStencilDesc.Format				= DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthStencilDesc.SampleDesc.Count	= 1;
-	depthStencilDesc.SampleDesc.Quality = 0;
+	depthStencilDesc.SampleDesc.Count	= swapChainDesc.SampleDesc.Count;
+	depthStencilDesc.SampleDesc.Quality = swapChainDesc.SampleDesc.Quality;
 	depthStencilDesc.Usage				= D3D11_USAGE_DEFAULT;
 	depthStencilDesc.BindFlags			= D3D11_BIND_DEPTH_STENCIL;
 	depthStencilDesc.CPUAccessFlags		= 0;
 	depthStencilDesc.MiscFlags			= 0;
 
 	// Create the Depth/Stencil View
-	result = d3d11Device->CreateTexture2D(&depthStencilDesc,NULL,&depthStencilBuffer);
-	if(FAILED(result)) return false;
+	if(FAILED( d3d11Device->CreateTexture2D(&depthStencilDesc,NULL,&depthStencilBuffer)))
+		return false;
 
-	result = d3d11Device->CreateDepthStencilView(depthStencilBuffer,NULL,&depthStencilView);
-	if(FAILED(result)) return false;
+	// Describe our Depth Stencil state
+	D3D11_DEPTH_STENCIL_DESC dsDesc;
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	dsDesc.StencilEnable = true;
+	dsDesc.StencilReadMask = 0xFF;
+	dsDesc.StencilWriteMask = 0xFF;
+
+	// Stencil operations if pixel is front-facing
+	dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	// Stencil operations if pixel is back-facing
+	dsDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	dsDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	// Create depth stencil state
+	if(FAILED(d3d11Device->CreateDepthStencilState(&dsDesc,&depthStencilState)))
+		return false;
+
+	// Describe our depth stencil view
+	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+	ZeroMemory(&depthStencilViewDesc,sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
+	depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+	depthStencilViewDesc.Texture2D.MipSlice = 0;
+	depthStencilViewDesc.Texture2DMS.UnusedField_NothingToDefine = 0;
+
+	// Create depth stencil view
+	if(FAILED(d3d11Device->CreateDepthStencilView(depthStencilBuffer,&depthStencilViewDesc,&depthStencilView)))
+		return false;
 
 	if(!CreateViewPort())		return false;
 	if(!CreateCBuffer())		return false;
@@ -131,6 +186,7 @@ void Direct3D::Shutdown(){
 	// Render and Depth buffers
 	SAFE_RELESE(renderTargetView);
 	SAFE_RELESE(depthStencilView);
+	SAFE_RELESE(depthStencilState);
 	SAFE_RELESE(depthStencilBuffer);
 
 	// Rasterizer States
@@ -148,6 +204,11 @@ void Direct3D::Shutdown(){
 
 	// BackBuffer
 	SAFE_RELESE(BackBuffer);
+
+	if (pDebug != nullptr){
+		pDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+		pDebug = nullptr;
+	}
 }
 
 void Direct3D::Update(double deltaTime){
@@ -164,12 +225,16 @@ void Direct3D::ClearScreen(float bgColor[4]){
 	d3d11DevCon->UpdateSubresource(cbPerFrameBuffer,0,NULL,&constbuffPerFrame,0,0);
 	d3d11DevCon->PSSetConstantBuffers(0,1,&cbPerFrameBuffer);
 
+	// Set the depth stencil state
+	d3d11DevCon->OMSetDepthStencilState(depthStencilState,1);
+
 	// Set our Render Target
 	d3d11DevCon->OMSetRenderTargets(1,&renderTargetView,depthStencilView);
 
 	// Set the default blend state (no blending) for opaque objects
 	d3d11DevCon->OMSetBlendState(0,0,0xffffffff);
-
+	
+	// Set sampler and rasterizer
 	d3d11DevCon->PSSetSamplers(0,1,&LinearSamplerState);
 	d3d11DevCon->RSSetState(RSCullNone);
 }
@@ -221,8 +286,8 @@ bool Direct3D::CreateCBuffer(){
 	cbbd.CPUAccessFlags = 0;
 	cbbd.MiscFlags		= 0;
 
-	result = d3d11Device->CreateBuffer(&cbbd,NULL,&cbPerObjectBuffer);
-	if (FAILED(result)) return false;
+	if(FAILED(d3d11Device->CreateBuffer(&cbbd,NULL,&cbPerObjectBuffer)))
+		return false;
 
 	// Per frame buffer
 	ZeroMemory(&cbbd,sizeof(D3D11_BUFFER_DESC));
@@ -232,8 +297,8 @@ bool Direct3D::CreateCBuffer(){
 	cbbd.CPUAccessFlags = 0;
 	cbbd.MiscFlags		= 0;
 
-	result = d3d11Device->CreateBuffer(&cbbd,NULL,&cbPerFrameBuffer);
-	if(FAILED(result)) return false;
+	if(FAILED(d3d11Device->CreateBuffer(&cbbd,NULL,&cbPerFrameBuffer)))
+		return false;
 
 	return true;
 }
@@ -250,29 +315,29 @@ bool Direct3D::CreateSampleState(){
 	sampDesc.MaxLOD			= D3D11_FLOAT32_MAX;
 
 	//Create the Sample State
-	result = d3d11Device->CreateSamplerState(&sampDesc,&LinearSamplerState);
-	if(FAILED(result)) return false;
-
+	if(FAILED(d3d11Device->CreateSamplerState(&sampDesc,&LinearSamplerState)))
+		return false;
 
 	D3D11_RASTERIZER_DESC cmdesc;
 	ZeroMemory(&cmdesc,sizeof(D3D11_RASTERIZER_DESC));
 	cmdesc.FillMode					= D3D11_FILL_SOLID;
 	cmdesc.CullMode					= D3D11_CULL_BACK;
 	cmdesc.FrontCounterClockwise	= true;
-	result = d3d11Device->CreateRasterizerState(&cmdesc,&CCWcullMode);
-	if(FAILED(result)) return false;
+	cmdesc.MultisampleEnable		= true;
+	if(FAILED(d3d11Device->CreateRasterizerState(&cmdesc,&CCWcullMode)))
+		return false;
 
 	cmdesc.FrontCounterClockwise = false;
 
-	result = d3d11Device->CreateRasterizerState(&cmdesc,&CWcullMode);
-	if(FAILED(result)) return false;
+	if(FAILED(d3d11Device->CreateRasterizerState(&cmdesc,&CWcullMode)))
+		return false;
 
 	if (wireframe)
 		cmdesc.FillMode = D3D11_FILL_WIREFRAME;
 	cmdesc.CullMode		= D3D11_CULL_NONE;
 
-	result = d3d11Device->CreateRasterizerState(&cmdesc,&RSCullNone);
-	if(FAILED(result)) return false;
+	if(FAILED(d3d11Device->CreateRasterizerState(&cmdesc,&RSCullNone)))
+		return false;
 
 	D3D11_BLEND_DESC blendDesc;
 	ZeroMemory(&blendDesc,sizeof(blendDesc));
@@ -292,8 +357,8 @@ bool Direct3D::CreateSampleState(){
 	blendDesc.AlphaToCoverageEnable = false;
 	blendDesc.RenderTarget[0]		= rtbd;
 
-	result = d3d11Device->CreateBlendState(&blendDesc,&Transparency);
-	if(FAILED(result)) return false;
+	if(FAILED(d3d11Device->CreateBlendState(&blendDesc,&Transparency)))
+		return false;
 
 	return true;
 }

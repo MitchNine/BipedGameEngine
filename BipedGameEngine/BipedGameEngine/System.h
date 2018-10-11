@@ -1,8 +1,9 @@
 #pragma once
-#include "engine\Window.h"
-#include "engine\Direct3D.h"
-#include "engine\Shader.h"
-#include "engine\Scene.h"
+#include "Engine\Window.h"
+#include "Engine\Direct3D.h"
+#include "Engine\Shader.h"
+#include "Engine\Scene.h"
+#include "Engine\Input.h"
 
 namespace bpd{
 	class System {
@@ -25,10 +26,14 @@ namespace bpd{
 		Direct3D	* direct3D;
 		Shader		* shader;
 		Scene		* scene;
+		Input		* input;
+		Time		* time;
 		Camera		* cam;
 		cbPerObject cbPerObj;
 
-		bpd::Time* time;
+		int curr_mouseX = 0,curr_mouseY = 0;
+		int prev_mouseX = 0,prev_mouseY = 0;
+
 		int frameCount,fps;
 		double frameTime;
 	};

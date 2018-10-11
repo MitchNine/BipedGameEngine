@@ -8,6 +8,7 @@
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
 #include <DirectXTex.h>
+#include <dinput.h>
 
 #pragma comment (lib, "DXGI.lib")
 #pragma comment (lib, "D2D1.lib")
