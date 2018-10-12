@@ -66,5 +66,5 @@ void Scene::Update(double dt) {
 
 void Scene::Shutdown() {
 	for(int i = 0; i < models.size(); i++)
-		models[i]->Shutdown();
+		SAFE_SHUTDOWN(models[i]);
 }

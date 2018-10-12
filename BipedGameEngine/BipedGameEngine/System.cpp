@@ -4,16 +4,22 @@ using namespace bpd;
 System *System::instance = nullptr;
 
 System::System() {
-	frameCount	= 0;
-	fps			= 0;
-	frameTime	= 0;
 	time		= new bpd::Time;
 	window		= new bpd::Window;
 	direct3D	= new bpd::Direct3D;
 	shader		= new bpd::Shader;
 	scene		= new bpd::Scene;
-	cam			= new bpd::Camera;
 	input		= new bpd::Input;
+	cam			= new bpd::Camera;
+	
+	frameCount	= 0;
+	fps			= 0;
+	frameTime	= 0;
+
+	curr_mouseX = 0;
+	curr_mouseY = 0;
+	prev_mouseX = 0;
+	prev_mouseY = 0;
 }
 System::~System() {}
 
@@ -46,6 +52,7 @@ bool System::Initialize(HINSTANCE hInstance){
 		return false;
 	}
 
+	// Initialize keyboard and mouse input
 	if(!input->Initialize(hInstance,window->GetHWND(),window->GetWindowWidth(),window->GetWindowHeight())) {
 		ErrorLogger::Log("Failed to initialize input");
 		return false;
@@ -54,8 +61,8 @@ bool System::Initialize(HINSTANCE hInstance){
 	// Set up the layout for the shader
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA,  0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,	  0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TANGENT",  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
@@ -82,15 +89,14 @@ bool System::Initialize(HINSTANCE hInstance){
 	}
 
 	// Camera information
-	cam->camPosition = XMVectorSet(0.0f,2.0f,-8.0f,0.0f);
-	cam->camTarget = XMVectorSet(0.0f,0.5f,0.0f,0.0f);
-	cam->camUp = XMVectorSet(0.0f,1.0f,0.0f,0.0f);
-	cam->camView = XMMatrixLookAtLH(cam->camPosition,cam->camTarget,cam->camUp);
-	cam->camProjection = XMMatrixPerspectiveFovLH(0.4f*3.14159f,(float)window->GetWindowWidth() / (float)window->GetWindowHeight(),1.0f,1000.0f);
+	cam->camPosition = DirectX::XMVectorSet(0.0f,2.0f,-8.0f,0.0f);
+	cam->camUp = DirectX::XMVectorSet(0.0f,1.0f,0.0f,0.0f);
+	cam->camView = DirectX::XMMatrixLookAtLH(cam->camPosition,cam->camTarget,cam->camUp);
+	cam->camProjection = DirectX::XMMatrixPerspectiveFovLH(0.4f*3.14159f,window->GetWindowWidth() / window->GetWindowHeight(),1.0f,1000.0f);
 
 	
 	Model* rock = scene->AddModel("Assets\\Rock\\Rock.obj",direct3D->GetDevice(),direct3D->GetSwapChain());
-	rock->transform.position = XMFLOAT3(0,0,0);
+	rock->transform.position = DirectX::XMFLOAT3(0,0,0);
 
 	// Set the system instance for static access
 	instance = this;
@@ -129,7 +135,6 @@ int System::MessageLoop() {
 				time->StartTimer();
 			}
 			frameTime = time->GetFrameTime();
-			input->Update();
 
 			Update(frameTime);
 			Render();
@@ -139,52 +144,38 @@ int System::MessageLoop() {
 }
 
 void System::Shutdown(){
-	SAFE_SHUTDOWN	(shader);
-	SAFE_SHUTDOWN	(input);
-	SAFE_SHUTDOWN	(scene);
+	SAFE_SHUTDOWN (shader);
+	SAFE_SHUTDOWN (input);
+	SAFE_SHUTDOWN (scene);
 
-	SAFE_DELETE		(window);
-	SAFE_DELETE		(time);
-	SAFE_DELETE		(cam);
+	SAFE_DELETE	(window);
+	SAFE_DELETE	(time);
+	SAFE_DELETE	(cam);
 
-	SAFE_SHUTDOWN	(direct3D);
+	SAFE_SHUTDOWN (direct3D);
 }
 
 void System::Update(double deltaTime){
+	
+	input->Update();
+
 	direct3D->Update(deltaTime);
 	scene->Update(deltaTime);
 	
-	if(input->GetKey(DIK_ESCAPE)) {
+	if(input->GetKeyDown(DIK_ESCAPE))
 		PostMessage(window->GetHWND(),WM_DESTROY,0,0);
-	}
 
 	if(input->GetMouseKey(1)) {
 		float speed = 10.0f * deltaTime;
-		if(input->GetKey(DIK_LSHIFT)) {
-			speed *= 3;
-		}
 
-		if(input->GetKey(DIK_A)) {
-			cam->moveLeftRight -= speed;
-		}
-		if(input->GetKey(DIK_D)) {
-			cam->moveLeftRight += speed;
-		}
-		if(input->GetKey(DIK_W)) {
-			cam->moveBackForward += speed;
-		}
-		if(input->GetKey(DIK_S)) {
-			cam->moveBackForward -= speed;
-		}
-		if(input->GetKey(DIK_SPACE)) {
-			cam->moveDownUp += speed;
-		}
-		if(input->GetKey(DIK_E)) {
-			cam->moveDownUp += speed;
-		}
-		if(input->GetKey(DIK_Q)) {
-			cam->moveDownUp -= speed;
-		}
+		if(input->GetKey(DIK_LSHIFT)) speed *= 3;
+		if(input->GetKey(DIK_A)) cam->moveLeftRight -= speed;
+		if(input->GetKey(DIK_D)) cam->moveLeftRight += speed;
+		if(input->GetKey(DIK_W)) cam->moveBackForward += speed;
+		if(input->GetKey(DIK_S)) cam->moveBackForward -= speed;
+		if(input->GetKey(DIK_E)) cam->moveDownUp += speed;
+		if(input->GetKey(DIK_Q)) cam->moveDownUp -= speed;
+		if(input->GetKey(DIK_SPACE)) cam->moveDownUp += speed;
 
 		input->GetMouseMovement(curr_mouseX,curr_mouseY);
 		if((curr_mouseX != prev_mouseX) || (curr_mouseY != prev_mouseY)) {
@@ -195,11 +186,9 @@ void System::Update(double deltaTime){
 			prev_mouseX = curr_mouseX;
 			prev_mouseY = curr_mouseY;
 		}
-
 	}
 
 	cam->Update();
-
 }
 
 void System::Render(){

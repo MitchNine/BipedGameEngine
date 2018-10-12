@@ -27,12 +27,12 @@
 if (x != nullptr){			\
 	x->Shutdown();			\
 	delete x;				\
-	x = NULL;				\
+	x = nullptr;			\
 }
 #define SAFE_DELETE(x)		\
 if (x != nullptr){			\
 	delete x;				\
-	x = NULL;				\
+	x = nullptr;			\
 }
 #define SAFE_RELESE(x)		\
 if (x != nullptr){			\
@@ -42,5 +42,5 @@ if (x != nullptr){			\
 #define SAFE_ARRAY_DELETE(x)\
 if (x != nullptr){			\
 	delete[] x;				\
-	x = NULL;				\
+	x = nullptr;			\
 }

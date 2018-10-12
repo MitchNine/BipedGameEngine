@@ -156,13 +156,13 @@ bool Direct3D::Initialize(
 	if(!CreateCBuffer())		return false;
 	if(!CreateSampleState())	return false;
 
-	light.pos = XMFLOAT3(0.0f,7.0f,0.0f);
-	light.dir = XMFLOAT3(0.5f,0.75f,-0.5f);
+	light.pos = DirectX::XMFLOAT3(0.0f,7.0f,0.0f);
+	light.dir = DirectX::XMFLOAT3(0.5f,0.75f,-0.5f);
 	light.range = 1000.0f;
 	light.cone = 12.0f;
-	light.att = XMFLOAT3(0.4f,0.02f,0.000f);
-	light.ambient = XMFLOAT4(0.2f,0.2f,0.2f,1.0f);
-	light.diffuse = XMFLOAT4(1.0f,1.0f,1.0f,1.0f);
+	light.att = DirectX::XMFLOAT3(0.4f,0.02f,0.000f);
+	light.ambient = DirectX::XMFLOAT4(0.2f,0.2f,0.2f,1.0f);
+	light.diffuse = DirectX::XMFLOAT4(1.0f,1.0f,1.0f,1.0f);
 
 	return true;
 }

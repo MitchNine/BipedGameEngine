@@ -9,10 +9,10 @@ namespace bpd{
 
 		void Update();
 
-		XMMATRIX WVP;
-		XMMATRIX camView;
-		XMMATRIX camProjection;
-		XMMATRIX camRotationMatrix;
+		DirectX::XMMATRIX WVP;
+		DirectX::XMMATRIX camView;
+		DirectX::XMMATRIX camProjection;
+		DirectX::XMMATRIX camRotationMatrix;
 
 		float moveLeftRight;
 		float moveBackForward;
@@ -20,14 +20,14 @@ namespace bpd{
 		float camYaw;
 		float camPitch;
 
-		XMVECTOR camPosition;
-		XMVECTOR camTarget;
-		XMVECTOR camUp;
+		DirectX::XMVECTOR camPosition;
+		DirectX::XMVECTOR camTarget;
+		DirectX::XMVECTOR camUp;
 
 	private:
-		XMVECTOR DefaultForward;
-		XMVECTOR DefaultRight;
-		XMVECTOR camForward;
-		XMVECTOR camRight;
+		DirectX::XMVECTOR DefaultForward;
+		DirectX::XMVECTOR DefaultRight;
+		DirectX::XMVECTOR camForward;
+		DirectX::XMVECTOR camRight;
 	};
 }

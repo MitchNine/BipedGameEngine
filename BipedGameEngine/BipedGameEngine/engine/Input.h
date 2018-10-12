@@ -16,25 +16,27 @@ namespace bpd {
 
 		bool GetMouseKey(int);
 		bool GetMouseKeyDown(int);
-		bool GetKey(unsigned char key);
-
+		bool GetKey(int key);
+		bool GetKeyDown(int key);
 
 	private:
 		bool ReadKeyboard();
 		bool ReadMouse();
 		void ProcessInput();
 	private:
-		IDirectInput8		*m_directInput;
-		IDirectInputDevice8	*m_keyboard;
-		IDirectInputDevice8	*m_mouse;
+		const static int NumKeys = 256;
 
-		unsigned char m_keyboardState[256];
-		DIMOUSESTATE m_mouseState;
+		IDirectInput8		*directInput;
+		IDirectInputDevice8	*keyboard;
+		IDirectInputDevice8	*mouse;
+		DIMOUSESTATE mouseState;
+		DIMOUSESTATE prevMouseState;
 
-		int m_screenWidth,m_screenHeight;
-		int m_mouseX,m_mouseY;
+		bool keys[NumKeys];
+		bool prevKeys[NumKeys];
 
-		int pinstate[8];
+		int screenWidth,screenHeight;
+		int mouseX,mouseY;
 	};
 
 }

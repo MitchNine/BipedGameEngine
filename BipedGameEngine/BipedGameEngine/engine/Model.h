@@ -12,9 +12,9 @@ namespace bpd {
 
 	struct SurfaceMaterial {
 		std::wstring MatName;   // So we can match the subset with it's material
-		XMFLOAT4 Diffuse;		// Surface's colors
-		XMFLOAT3 Ambient;		// Transparency (Alpha) stored in 4th component
-		XMFLOAT4 Specular;      // Specular power stored in 4th component
+		DirectX::XMFLOAT4 Diffuse;		// Surface's colors
+		DirectX::XMFLOAT3 Ambient;		// Transparency (Alpha) stored in 4th component
+		DirectX::XMFLOAT4 Specular;      // Specular power stored in 4th component
 
 		// Texture ID's to look up texture in SRV array
 		int DiffuseTextureID;
@@ -33,26 +33,26 @@ namespace bpd {
 	};
 	struct ObjModel {
 		int Subsets = 0;                    // Number of subsets in obj model
-		XMMATRIX World = XMMATRIX();        // Models world matrix
+		DirectX::XMMATRIX World = DirectX::XMMATRIX();	// Models world matrix
 		ID3D11Buffer* VertBuff;             // Models vertex buffer
 		ID3D11Buffer* IndexBuff;            // Models index buffer
 		std::vector<int> SubsetIndexStart;  // Subset's index offset
 		std::vector<int> SubsetMaterialID;  // Lookup ID for subsets surface material
 		std::vector<DWORD> Indices;         // Models index list
-		std::vector<XMFLOAT3> Vertices;     // Models vertex positions list
-		std::vector<XMFLOAT3> AABB;			// Stores models AABB (min vertex, max vertex, and center)
+		std::vector<DirectX::XMFLOAT3> Vertices;		// Models vertex positions list
+		std::vector<DirectX::XMFLOAT3> AABB;			// Stores models AABB (min vertex, max vertex, and center)
 											// Where AABB[0] is the min Vertex, and AABB[1] is the max vertex
-		XMFLOAT3 Center;					// True center of the model
+		DirectX::XMFLOAT3 Center;			// True center of the model
 		float BoundingSphere;				// Model's bounding sphere
 	};
 	struct Transform {
-		XMMATRIX MRotation;					// Rotation Matrix
-		XMMATRIX MScale;					// Scale Matrix
-		XMMATRIX MTranslation;				// Translation Matrix
+		DirectX::XMMATRIX MRotation;				// Rotation Matrix
+		DirectX::XMMATRIX MScale;					// Scale Matrix
+		DirectX::XMMATRIX MTranslation;				// Translation Matrix
 
-		XMFLOAT3 position;					// Vector3 to translate the Translation Matrix
-		XMFLOAT3 scail;						// Vector3 to scail the Scale Matrix
-		XMFLOAT3 rotation;					// Vector3 to rotate the Rotation Matrix
+		DirectX::XMFLOAT3 position;					// Vector3 to translate the Translation Matrix
+		DirectX::XMFLOAT3 scail;					// Vector3 to scail the Scale Matrix
+		DirectX::XMFLOAT3 rotation;					// Vector3 to rotate the Rotation Matrix
 	};
 
 	class Model {

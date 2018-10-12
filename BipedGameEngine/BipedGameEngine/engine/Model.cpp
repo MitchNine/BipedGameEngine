@@ -1,5 +1,6 @@
 #include "Model.h"
 using namespace bpd;
+using namespace DirectX;
 
 Model::Model() {
 	transform.MTranslation	= DirectX::XMMATRIX();
