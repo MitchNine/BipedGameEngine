@@ -79,10 +79,10 @@ namespace bpd {
 		);
 
 		bool LoadObjModel(
-			ID3D11Device** device,		// Pointer to the device
+			ID3D11Device* device,		// Pointer to the device
 			std::wstring path,			// object path
 			std::wstring Filename,      // obj m_model filename (m_model.obj)
-			IDXGISwapChain** SwapChain,	// Pointer to the swap chain
+			IDXGISwapChain* SwapChain,	// Pointer to the swap chain
 			bool IsRHCoordSys,          // True if m_model was created in right hand coord system
 			bool ComputeNormals			// True to compute the normals, false to use the files normals
 		);

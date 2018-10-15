@@ -39,10 +39,10 @@ HRESULT Model::CreateTexture(ID3D11Device* device,const WCHAR* filename,ID3D11Sh
 }
 
 bool Model::LoadObjModel(
-	ID3D11Device** device,		// Pointer to the device
+	ID3D11Device* device,		// Pointer to the device
 	std::wstring path,			// object path
 	std::wstring Filename,      // obj m_model filename (m_model.obj)
-	IDXGISwapChain** SwapChain,	// Pointer to the SwapChain
+	IDXGISwapChain* SwapChain,	// Pointer to the SwapChain
 	bool IsRHCoordSys,          // True if m_model was created in right hand coord system
 	bool ComputeNormals			// True to compute the normals, false to use the files normals
 ) {
@@ -423,7 +423,7 @@ bool Model::LoadObjModel(
 		}
 	} else    // If we could not open the file
 	{
-		(*SwapChain)->SetFullscreenState(false,NULL); // Make sure we are out of fullscreen
+		SwapChain->SetFullscreenState(false,NULL); // Make sure we are out of fullscreen
 
 													  // create message
 		std::wstring message = L"Could not open: ";
@@ -595,7 +595,7 @@ bool Model::LoadObjModel(
 									if(!alreadyLoaded) {
 										ID3D11ShaderResourceView* tempSRV;
 										setpath = path;
-										hr = CreateTexture((*device),setpath.append(fileNamePath).c_str(),&tempSRV);
+										hr = CreateTexture(device,setpath.append(fileNamePath).c_str(),&tempSRV);
 										setpath.clear();
 										if(SUCCEEDED(hr)) {
 											textureMgr.TextureNameArray.push_back(fileNamePath.c_str());
@@ -643,7 +643,7 @@ bool Model::LoadObjModel(
 									if(!alreadyLoaded) {
 										ID3D11ShaderResourceView* tempSRV;
 										setpath = path;
-										hr = CreateTexture((*device),setpath.append(fileNamePath).c_str(),&tempSRV);
+										hr = CreateTexture(device,setpath.append(fileNamePath).c_str(),&tempSRV);
 										setpath.clear();
 										if(SUCCEEDED(hr)) {
 											textureMgr.TextureNameArray.push_back(fileNamePath.c_str());
@@ -691,7 +691,7 @@ bool Model::LoadObjModel(
 									if(!alreadyLoaded) {
 										ID3D11ShaderResourceView* tempSRV;
 										setpath = path;
-										hr = CreateTexture((*device),setpath.append(fileNamePath).c_str(),&tempSRV);
+										hr = CreateTexture(device,setpath.append(fileNamePath).c_str(),&tempSRV);
 										setpath.clear();
 										if(SUCCEEDED(hr)) {
 											textureMgr.TextureNameArray.push_back(fileNamePath.c_str());
@@ -740,7 +740,7 @@ bool Model::LoadObjModel(
 								if(!alreadyLoaded) {
 									ID3D11ShaderResourceView* tempSRV;
 									setpath = path;
-									hr = CreateTexture((*device),setpath.append(fileNamePath).c_str(),&tempSRV);
+									hr = CreateTexture(device,setpath.append(fileNamePath).c_str(),&tempSRV);
 									setpath.clear();
 									if(SUCCEEDED(hr)) {
 										textureMgr.TextureNameArray.push_back(fileNamePath.c_str());
@@ -794,7 +794,7 @@ bool Model::LoadObjModel(
 											if(!alreadyLoaded) {
 												ID3D11ShaderResourceView* tempSRV;
 												setpath = path;
-												hr = CreateTexture((*device),setpath.append(fileNamePath).c_str(),&tempSRV);
+												hr = CreateTexture(device,setpath.append(fileNamePath).c_str(),&tempSRV);
 												setpath.clear();
 												if(SUCCEEDED(hr)) {
 													textureMgr.TextureNameArray.push_back(fileNamePath.c_str());
@@ -893,7 +893,7 @@ bool Model::LoadObjModel(
 							if(!alreadyLoaded) {
 								ID3D11ShaderResourceView* tempSRV;
 								setpath = path;
-								hr = CreateTexture((*device),setpath.append(fileNamePath).c_str(),&tempSRV);
+								hr = CreateTexture(device,setpath.append(fileNamePath).c_str(),&tempSRV);
 								setpath.clear();
 								if(SUCCEEDED(hr)) {
 									textureMgr.TextureNameArray.push_back(fileNamePath.c_str());
@@ -913,7 +913,7 @@ bool Model::LoadObjModel(
 		}
 	} else    // If we could not open the material library
 	{
-		(*SwapChain)->SetFullscreenState(false,NULL); // Make sure we are out of fullscreen
+		SwapChain->SetFullscreenState(false,NULL); // Make sure we are out of fullscreen
 
 		std::wstring message = L"Could not open: ";
 		message += meshMatLib;
@@ -1121,7 +1121,7 @@ bool Model::LoadObjModel(
 	D3D11_SUBRESOURCE_DATA iinitData;
 
 	iinitData.pSysMem = &model.Indices[0];
-	(*device)->CreateBuffer(&indexBufferDesc,&iinitData,&model.IndexBuff);
+	device->CreateBuffer(&indexBufferDesc,&iinitData,&model.IndexBuff);
 
 	//Create Vertex Buffer
 	D3D11_BUFFER_DESC vertexBufferDesc;
@@ -1137,7 +1137,7 @@ bool Model::LoadObjModel(
 
 	ZeroMemory(&vertexBufferData,sizeof(vertexBufferData));
 	vertexBufferData.pSysMem = &vertices[0];
-	hr = (*device)->CreateBuffer(&vertexBufferDesc,&vertexBufferData,&model.VertBuff);
+	hr = device->CreateBuffer(&vertexBufferDesc,&vertexBufferData,&model.VertBuff);
 
 	return true;
 }

@@ -25,15 +25,56 @@ Model* Scene::AddModel(std::string path, ID3D11Device * device, IDXGISwapChain *
 	dir = path.substr(0, i + 1);
 	name = path.substr(i + 1,path.size() - 1);
 	m->LoadObjModel(
-		&device,
+		device,
 		StringConverter::StringToWide(dir),
 		StringConverter::StringToWide(name),
-		&swapChain, true, true
+		swapChain, true, true
 	);
 
 	models.push_back(m);
 
 	return m;
+}
+
+Model* Scene::AddModel(
+	Primitives shape,
+	ID3D11Device* device,
+	IDXGISwapChain* swapChain
+) {
+	Model *model = new Model;
+
+	switch (shape) {
+	case bpd::CONE:
+		model->LoadObjModel(device, L"Project\\Library\\Primitive\\", L"cone.obj", swapChain, true, true);
+		break;
+	case bpd::CUBE:
+		model->LoadObjModel(device, L"Project\\Library\\Primitive\\", L"cube.obj", swapChain, true, true);
+		break;
+	case bpd::CYLINDER:
+		model->LoadObjModel(device, L"Project\\Library\\Primitive\\", L"cylinder.obj", swapChain, true, true);
+		break;
+	case bpd::DISC:
+		model->LoadObjModel(device, L"Project\\Library\\Primitive\\", L"disc.obj", swapChain, true, true);
+		break;
+	case bpd::PLANE:
+		model->LoadObjModel(device, L"Project\\Library\\Primitive\\", L"plane.obj", swapChain, true, true);
+		break;
+	case bpd::PLATONIC:
+		model->LoadObjModel(device, L"Project\\Library\\Primitive\\", L"platonic.obj", swapChain, true, true);
+		break;
+	case bpd::SPHERE:
+		model->LoadObjModel(device, L"Project\\Library\\Primitive\\", L"sphere.obj", swapChain, true, true);
+		break;
+	case bpd::TORUS:
+		model->LoadObjModel(device, L"Project\\Library\\Primitive\\", L"torus.obj", swapChain, true, true);
+		break;
+	default:
+		break;
+	}
+
+	models.push_back(model);
+
+	return model;
 }
 
 Model* Scene::GetModel(int id){
@@ -58,7 +99,6 @@ void Scene::Render(
 
 void Scene::Update(double dt) {
 	timer += 0.01f;
-
 	for(int i = 0; i < models.size(); i++)
 		models[i]->Update();
 

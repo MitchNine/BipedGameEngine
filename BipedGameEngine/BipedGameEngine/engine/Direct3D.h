@@ -29,6 +29,7 @@ namespace bpd{
 		inline bpd::cbPerObject		GetCBPerObject()			{ return cbPerObj; }
 		inline bpd::cbPerFrame		GetCBPerFrame()				{ return constbuffPerFrame; }
 
+		inline bpd::Light			GETLight()					{ return light; }
 
 		HRESULT CleanupRenderTarget();
 		HRESULT CreateRenderTarget();

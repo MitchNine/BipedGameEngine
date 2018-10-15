@@ -62,7 +62,7 @@ bool Direct3D::Initialize(
 	ZeroMemory(&swapChainDesc,sizeof(DXGI_SWAP_CHAIN_DESC));
 	swapChainDesc.BufferDesc			= bufferDesc;
 	swapChainDesc.SampleDesc.Count		= 4;
-	swapChainDesc.SampleDesc.Quality	= 0;
+	swapChainDesc.SampleDesc.Quality	= 4;
 	swapChainDesc.BufferUsage			= DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.BufferCount			= 1;
 	swapChainDesc.OutputWindow			= hwnd;
@@ -90,7 +90,6 @@ bool Direct3D::Initialize(
 
 	if (FAILED(d3d11Device->QueryInterface(IID_PPV_ARGS(&pDebug))))
 		return false;
-
 
 	// Create our BackBuffer and Render Target
 	if (FAILED(CreateRenderTarget()))

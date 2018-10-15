@@ -3,6 +3,17 @@
 #include "Model.h"
 
 namespace bpd {
+	enum Primitives {
+		CONE,
+		CUBE,
+		CYLINDER,
+		DISC,
+		PLANE,
+		PLATONIC,
+		SPHERE,
+		TORUS,
+	};
+
 	class Scene {
 	public:
 		Scene();
@@ -19,6 +30,11 @@ namespace bpd {
 
 		Model* AddModel(
 			std::string path,
+			ID3D11Device* device,
+			IDXGISwapChain* swapChain
+		);
+		Model* AddModel(
+			Primitives shape,
 			ID3D11Device* device,
 			IDXGISwapChain* swapChain
 		);

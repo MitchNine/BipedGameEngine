@@ -69,9 +69,9 @@ bool System::Initialize(HINSTANCE hInstance){
 
 	// Initialize the shader
 	if (!shader->Initialize(
-		"Assets\\shaders\\Effects.fx",
+		"Project\\Assets\\shaders\\Effects.fx",
 		"VS",
-		"Assets\\shaders\\Effects.fx",
+		"Project\\Assets\\shaders\\Effects.fx",
 		"PS",
 		ARRAYSIZE(layout),
 		layout,
@@ -94,9 +94,12 @@ bool System::Initialize(HINSTANCE hInstance){
 	cam->camView = DirectX::XMMatrixLookAtLH(cam->camPosition,cam->camTarget,cam->camUp);
 	cam->camProjection = DirectX::XMMatrixPerspectiveFovLH(0.4f*3.14159f,window->GetWindowWidth() / window->GetWindowHeight(),1.0f,1000.0f);
 
-	
-	Model* rock = scene->AddModel("Assets\\Rock\\Rock.obj",direct3D->GetDevice(),direct3D->GetSwapChain());
-	rock->transform.position = DirectX::XMFLOAT3(0,0,0);
+	Model* light = scene->AddModel(Primitives::CONE,direct3D->GetDevice(),direct3D->GetSwapChain());
+	light->transform.position = direct3D->GETLight().pos;
+	light->transform.rotation = direct3D->GETLight().dir;
+
+	Model* model = scene->AddModel("Project\\Assets\\Rock_9\\Rock_9.obj", direct3D->GetDevice(), direct3D->GetSwapChain());
+	model->transform.scail = DirectX::XMFLOAT3(0.5f, 0.5f, 0.5f);
 
 	// Set the system instance for static access
 	instance = this;
@@ -155,11 +158,16 @@ void System::Shutdown(){
 	SAFE_SHUTDOWN (direct3D);
 }
 
+float timer = 0;
 void System::Update(double deltaTime){
-	
+	timer += 0.01f;
+
 	input->Update();
 
 	direct3D->Update(deltaTime);
+
+	scene->GetModel(1)->transform.rotation = DirectX::XMFLOAT3(0, timer, 0);
+
 	scene->Update(deltaTime);
 	
 	if(input->GetKeyDown(DIK_ESCAPE))

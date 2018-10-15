@@ -85,6 +85,67 @@ bool Shader::Initialize(
 	return true;
 }
 
+bool Shader::Initialize(
+	ID3D11Device				* d3d11Device,
+	ID3D11DeviceContext			* d3d11DevCon
+) {
+	ID3DBlob *errors;
+
+	// Compile Shaders from shader file
+	result = D3DCompileFromFile(
+		L"Project\\Library\\Shaders\\Effects.fx",
+		0, 0, "VS", "vs_4_0", D3DCOMPILE_DEBUG, 0, &VS_Buffer, &errors);
+	if (FAILED(result)) {
+		MessageBox(0, (WCHAR *)errors->GetBufferPointer(), L"Error", MB_OK | MB_ICONERROR);
+		return false;
+	}
+
+	result = D3DCompileFromFile(
+		L"Project\\Library\\Shaders\\Effects.fx",
+		0, 0, "PS", "ps_4_0", D3DCOMPILE_DEBUG, 0, &PS_Buffer, &errors);
+	if (FAILED(result)) {
+		MessageBox(0, (WCHAR *)errors->GetBufferPointer(), L"Error", MB_OK | MB_ICONERROR);
+		return false;
+	}
+
+	// Create the Shader Objects
+	result = d3d11Device->CreateVertexShader(VS_Buffer->GetBufferPointer(), VS_Buffer->GetBufferSize(), NULL, &VS);
+	if (FAILED(result)) return false;
+	result = d3d11Device->CreatePixelShader(PS_Buffer->GetBufferPointer(), PS_Buffer->GetBufferSize(), NULL, &PS);
+	if (FAILED(result)) return false;
+
+	// Set Vertex and Pixel Shaders
+	d3d11DevCon->VSSetShader(VS, 0, 0);
+	d3d11DevCon->PSSetShader(PS, 0, 0);
+
+	D3D11_INPUT_ELEMENT_DESC layout[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA,  0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,	  0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TANGENT",  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	};
+
+	// Create the Input Layout
+	result = d3d11Device->CreateInputLayout(
+		layout,
+		ARRAYSIZE(layout),
+		VS_Buffer->GetBufferPointer(),
+		VS_Buffer->GetBufferSize(),
+		&inputLayout
+	);
+	if (FAILED(result)) return false;
+
+	// Set the Input Layout
+	d3d11DevCon->IASetInputLayout(inputLayout);
+
+	// Set Primitive Topology
+	d3d11DevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	return true;
+}
+
+
 void Shader::Shutdown(){
 	// Vertex and Pixel shaders
 	SAFE_RELESE(VS);

@@ -17,6 +17,10 @@ namespace bpd{
 			ID3D11Device				* d3d11Device,
 			ID3D11DeviceContext			* d3d11DevCon
 		);
+		bool Initialize(
+			ID3D11Device				* d3d11Device,
+			ID3D11DeviceContext			* d3d11DevCon
+		);
 		void Shutdown();
 		void SetShader(ID3D11DeviceContext * d3d11DevCon);
 

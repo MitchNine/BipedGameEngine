@@ -117,7 +117,7 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy "$(ProjectDir)Assets\*.*" "$(OutDir)Assets\" /Y /I /E </Command>
+      <Command>xcopy "$(ProjectDir)Project\*.*" "$(OutDir)Project\" /Y /I /E </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -135,7 +135,7 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy "$(ProjectDir)Assets\*.*" "$(OutDir)Assets\" /Y /I /E </Command>
+      <Command>xcopy "$(ProjectDir)Project\*.*" "$(OutDir)Project\" /Y /I /E </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -157,7 +157,7 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy "$(ProjectDir)Assets\*.*" "$(OutDir)Assets\" /Y /I /E </Command>
+      <Command>xcopy "$(ProjectDir)Project\*.*" "$(OutDir)Project\" /Y /I /E </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -179,7 +179,7 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy "$(ProjectDir)Assets\*.*" "$(OutDir)Assets\" /Y /I /E </Command>
+      <Command>xcopy "$(ProjectDir)Project\*.*" "$(OutDir)Project\" /Y /I /E </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
