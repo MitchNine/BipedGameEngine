@@ -24,6 +24,7 @@ Direct3D::Direct3D() {
 	// Constant Buffers
 	cbPerObjectBuffer	= 0;
 	cbPerFrameBuffer	= 0;
+	cbPerObjectBuffer_gizmos = 0;
 
 	// BackBuffer
 	BackBuffer		= 0;
@@ -199,6 +200,7 @@ void Direct3D::Shutdown(){
 
 	// Constant Buffers
 	SAFE_RELESE(cbPerObjectBuffer);
+	SAFE_RELESE(cbPerObjectBuffer_gizmos);
 	SAFE_RELESE(cbPerFrameBuffer);
 
 	// BackBuffer
@@ -235,9 +237,28 @@ void Direct3D::ClearScreen(float bgColor[4]){
 	
 	// Set sampler and rasterizer
 	d3d11DevCon->PSSetSamplers(0,1,&LinearSamplerState);
-	d3d11DevCon->RSSetState(RSCullNone);
 }
 
+
+void Direct3D::SetRasterizerState(RasterizerState state) {
+	switch (state) {
+	case bpd::Direct3D::eCCWcullMode:
+		d3d11DevCon->RSSetState(CCWcullMode);
+		break;
+	case bpd::Direct3D::eCWcullMode:
+		d3d11DevCon->RSSetState(CWcullMode);
+		break;
+	case bpd::Direct3D::eRSCullNone:
+		d3d11DevCon->RSSetState(RSCullNone);
+		break;
+	case bpd::Direct3D::eRSCullNoneWF:
+		d3d11DevCon->RSSetState(RSCullNoneWF);
+		break;
+	default:
+		break;
+	}
+	
+}
 void Direct3D::Present(){
 	//Present the back buffer to the screen
 	if (vsync) SwapChain->Present(1,0);
@@ -288,6 +309,17 @@ bool Direct3D::CreateCBuffer(){
 	if(FAILED(d3d11Device->CreateBuffer(&cbbd,NULL,&cbPerObjectBuffer)))
 		return false;
 
+	// Per object gizmos buffer
+	ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
+	cbbd.Usage = D3D11_USAGE_DEFAULT;
+	cbbd.ByteWidth = sizeof(bpd::cbPerObject_gizmos);
+	cbbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbbd.CPUAccessFlags = 0;
+	cbbd.MiscFlags = 0;
+
+	if (FAILED(d3d11Device->CreateBuffer(&cbbd, NULL, &cbPerObjectBuffer_gizmos)))
+		return false;
+
 	// Per frame buffer
 	ZeroMemory(&cbbd,sizeof(D3D11_BUFFER_DESC));
 	cbbd.Usage			= D3D11_USAGE_DEFAULT;
@@ -336,6 +368,11 @@ bool Direct3D::CreateSampleState(){
 	cmdesc.CullMode		= D3D11_CULL_NONE;
 
 	if(FAILED(d3d11Device->CreateRasterizerState(&cmdesc,&RSCullNone)))
+		return false;
+
+	cmdesc.FillMode = D3D11_FILL_WIREFRAME;
+
+	if (FAILED(d3d11Device->CreateRasterizerState(&cmdesc, &RSCullNoneWF)))
 		return false;
 
 	D3D11_BLEND_DESC blendDesc;

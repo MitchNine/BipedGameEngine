@@ -7,7 +7,6 @@ System::System() {
 	time		= new bpd::Time;
 	window		= new bpd::Window;
 	direct3D	= new bpd::Direct3D;
-	shader		= new bpd::Shader;
 	scene		= new bpd::Scene;
 	input		= new bpd::Input;
 	cam			= new bpd::Camera;
@@ -58,32 +57,10 @@ bool System::Initialize(HINSTANCE hInstance){
 		return false;
 	}
 
-	// Set up the layout for the shader
-	D3D11_INPUT_ELEMENT_DESC layout[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA,  0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,	  0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TANGENT",  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-	};
-
-	// Initialize the shader
-	if (!shader->Initialize(
-		"Project\\Assets\\shaders\\Effects.fx",
-		"VS",
-		"Project\\Assets\\shaders\\Effects.fx",
-		"PS",
-		ARRAYSIZE(layout),
-		layout,
-		direct3D->GetDevice(),
-		direct3D->GetDeviceContext()
-	)){
-		ErrorLogger::Log("Failed to shader");
-		return false;
-	}
+	
 
 	// Initialize the scene
-	if (!scene->Initialize()) {
+	if (!scene->Initialize(direct3D)) {
 		ErrorLogger::Log("Failed to initialize scene");
 		return false;
 	}
@@ -147,7 +124,6 @@ int System::MessageLoop() {
 }
 
 void System::Shutdown(){
-	SAFE_SHUTDOWN (shader);
 	SAFE_SHUTDOWN (input);
 	SAFE_SHUTDOWN (scene);
 
@@ -205,14 +181,10 @@ void System::Render(){
 	// Clear the render target and stencil
 	direct3D->ClearScreen(color);
 
-	// Set the shader for the models to use
-	shader->SetShader(direct3D->GetDeviceContext());
-
 	// Render all the models in the scene
 	scene->Render(
-		direct3D->GetDeviceContext(),
-		cam,
-		direct3D->GetCBPerObjectBuffer()
+		direct3D,
+		cam
 	);
 
 	// pass everything to the GPU

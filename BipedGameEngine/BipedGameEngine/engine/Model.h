@@ -1,5 +1,6 @@
 #pragma once
 #include "core\pch.h"
+#include "Direct3D.h"
 #include "Camera.h"
 #include <fstream>
 #include <istream>
@@ -62,12 +63,19 @@ namespace bpd {
 
 		bool Initialize();
 		void Render(
-			ID3D11DeviceContext* DevCon,		// Pointer to the device
+			Direct3D* d3d,						// Pointer to direct 3D
 			Camera* cam,						// Pointer to the camera
 			UINT stride,						// stride of the vertex
 			UINT offset,						// offset of the vertex
-			ID3D11Buffer* cbPerObjectBuffer,	// Pointer to the per object buffer
 			cbPerObject& cbPerObj				// Reference to the pre object struct
+		);
+		void Render_gizmos(
+			Direct3D* d3d,						// Pointer to direct 3D
+			Camera* cam,						// Pointer to the camera
+			UINT stride,						// stride of the vertex
+			UINT offset,						// offset of the vertex
+			cbPerObject_gizmos& cbPerObj,		// Reference to the pre object struct
+			DirectX::XMFLOAT4 color
 		);
 		void Update();
 		void Shutdown();
@@ -88,10 +96,10 @@ namespace bpd {
 		);
 
 		Transform						transform;
+		ObjModel						model;
 	private:
 		std::vector<SurfaceMaterial>	material;
 		TextureManager					textureMgr;
-		ObjModel						model;
 	};
 
 }

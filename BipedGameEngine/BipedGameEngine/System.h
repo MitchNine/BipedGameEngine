@@ -1,7 +1,6 @@
 #pragma once
 #include "Engine\Window.h"
 #include "Engine\Direct3D.h"
-#include "Engine\Shader.h"
 #include "Engine\Scene.h"
 #include "Engine\Input.h"
 
@@ -24,7 +23,6 @@ namespace bpd{
 	private:
 		Window		* window;
 		Direct3D	* direct3D;
-		Shader		* shader;
 		Scene		* scene;
 		Input		* input;
 		Time		* time;

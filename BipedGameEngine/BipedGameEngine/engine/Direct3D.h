@@ -7,6 +7,13 @@ namespace bpd{
 		Direct3D();
 		~Direct3D();
 
+		enum RasterizerState {
+			eCCWcullMode,
+			eCWcullMode,
+			eRSCullNone,
+			eRSCullNoneWF,
+		};
+
 		bool Initialize(
 			HINSTANCE hInstance,
 			int width,
@@ -23,13 +30,13 @@ namespace bpd{
 		inline IDXGISwapChain		* GetSwapChain()			{ return SwapChain; }
 		inline ID3D11Device			* GetDevice()				{ return d3d11Device; }
 		inline ID3D11DeviceContext	* GetDeviceContext()		{ return d3d11DevCon; }
-		inline ID3D11Buffer			* GetCBPerObjectBuffer()	{ return cbPerObjectBuffer; }
-		inline ID3D11Buffer			* GetCBPerFrameBuffer()		{ return cbPerFrameBuffer; }
 
 		inline bpd::cbPerObject		GetCBPerObject()			{ return cbPerObj; }
 		inline bpd::cbPerFrame		GetCBPerFrame()				{ return constbuffPerFrame; }
 
 		inline bpd::Light			GETLight()					{ return light; }
+
+		void SetRasterizerState(RasterizerState state);
 
 		HRESULT CleanupRenderTarget();
 		HRESULT CreateRenderTarget();
@@ -43,6 +50,11 @@ namespace bpd{
 		bool wireframe;
 		bool fullscreen;
 		bool vsync;
+
+		// Constant Buffers
+		ID3D11Buffer			* cbPerObjectBuffer;
+		ID3D11Buffer			* cbPerObjectBuffer_gizmos;
+		ID3D11Buffer			* cbPerFrameBuffer;
 
 	private:
 		int width;
@@ -68,15 +80,12 @@ namespace bpd{
 		ID3D11RasterizerState	* CCWcullMode;
 		ID3D11RasterizerState	* CWcullMode;
 		ID3D11RasterizerState	* RSCullNone;
+		ID3D11RasterizerState	* RSCullNoneWF;
 
 		// Blend and Sampler States
 		ID3D11SamplerState		* LinearSamplerState;
 		ID3D11BlendState		* Transparency;
-		
-		// Constant Buffers
-		ID3D11Buffer			* cbPerObjectBuffer;
-		ID3D11Buffer			* cbPerFrameBuffer;
-		
+				
 		// BackBuffer
 		ID3D11Texture2D			* BackBuffer;
 

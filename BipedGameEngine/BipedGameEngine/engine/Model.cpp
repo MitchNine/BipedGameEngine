@@ -1149,16 +1149,15 @@ bool Model::Initialize() {
 }
 
 void Model::Render(
-	ID3D11DeviceContext* DevCon,
+	Direct3D* d3d,
 	Camera* cam,
 	UINT stride,
 	UINT offset,
-	ID3D11Buffer* cbPerObjectBuffer,
 	cbPerObject& cbPerObj
 ) {
-	DevCon->IASetIndexBuffer(model.IndexBuff,DXGI_FORMAT_R32_UINT,0);
+	d3d->GetDeviceContext()->IASetIndexBuffer(model.IndexBuff,DXGI_FORMAT_R32_UINT,0);
 	// Set the grounds vertex buffer
-	DevCon->IASetVertexBuffers(0,1,&model.VertBuff,&stride,&offset);
+	d3d->GetDeviceContext()->IASetVertexBuffers(0,1,&model.VertBuff,&stride,&offset);
 
 	// Set the WVP matrix and send it to the constant buffer in effect file
 	// This also only needs to be set once per model
@@ -1169,29 +1168,68 @@ void Model::Render(
 	for(int i = 0; i < model.Subsets; ++i) {
 		// Only draw the NON-transparent parts of the model. 
 		if(!material[model.SubsetMaterialID[i]].IsTransparent) {
-			cbPerObj.difColor	= material[model.SubsetMaterialID[i]].Diffuse;			// Let shader know which color to draw the model (if no diffuse texture we defined)
+			
+			cbPerObj.difColor = material[model.SubsetMaterialID[i]].Diffuse;			// Let shader know which color to draw the model (if no diffuse texture we defined)
 			cbPerObj.hasTexture = material[model.SubsetMaterialID[i]].HasDiffTexture;	// Let shader know if we need to use a texture
 			cbPerObj.hasNormMap = material[model.SubsetMaterialID[i]].HasNormMap;		// Let shader know if we need to do normal mapping
-			DevCon->UpdateSubresource(cbPerObjectBuffer,0,NULL,&cbPerObj,0,0);
-			DevCon->VSSetConstantBuffers(0,1,&cbPerObjectBuffer);
-			DevCon->PSSetConstantBuffers(1,1,&cbPerObjectBuffer);
+
+			d3d->GetDeviceContext()->UpdateSubresource(d3d->cbPerObjectBuffer, 0, NULL, &cbPerObj, 0, 0);
+			d3d->GetDeviceContext()->VSSetConstantBuffers(0, 1, &d3d->cbPerObjectBuffer);
+			d3d->GetDeviceContext()->PSSetConstantBuffers(1, 1, &d3d->cbPerObjectBuffer);
 
 			// If this subset has a diffuse texture, send it to the pixel shader
-			if(material[model.SubsetMaterialID[i]].HasDiffTexture)
-				DevCon->PSSetShaderResources(0,1,&textureMgr.TextureList[material[model.SubsetMaterialID[i]].DiffuseTextureID]);
+			if (material[model.SubsetMaterialID[i]].HasDiffTexture)
+				d3d->GetDeviceContext()->PSSetShaderResources(0, 1, &textureMgr.TextureList[material[model.SubsetMaterialID[i]].DiffuseTextureID]);
 
 			// If this subset has a normal (bump) map, send it to the pixel shader
-			if(material[model.SubsetMaterialID[i]].HasNormMap)
-				DevCon->PSSetShaderResources(1,1,&textureMgr.TextureList[material[model.SubsetMaterialID[i]].NormMapTextureID]);
+			if (material[model.SubsetMaterialID[i]].HasNormMap)
+				d3d->GetDeviceContext()->PSSetShaderResources(1, 1, &textureMgr.TextureList[material[model.SubsetMaterialID[i]].NormMapTextureID]);
 
 			// Draw the NON-transparent stuff
 			int indexStart = model.SubsetIndexStart[i];
 			int indexDrawAmount = model.SubsetIndexStart[i + 1] - indexStart;
-			DevCon->DrawIndexed(indexDrawAmount,indexStart,0);
+
+			d3d->GetDeviceContext()->DrawIndexed(indexDrawAmount,indexStart,0);
 		}
 	}
 }
 
+void Model::Render_gizmos(
+	Direct3D* d3d,
+	Camera* cam,
+	UINT stride,
+	UINT offset,
+	cbPerObject_gizmos& cbPerObj_gizmod,
+	DirectX::XMFLOAT4 color
+) {
+	d3d->GetDeviceContext()->IASetIndexBuffer(model.IndexBuff, DXGI_FORMAT_R32_UINT, 0);
+	// Set the grounds vertex buffer
+	d3d->GetDeviceContext()->IASetVertexBuffers(0, 1, &model.VertBuff, &stride, &offset);
+
+	// Set the WVP matrix and send it to the constant buffer in effect file
+	// This also only needs to be set once per model
+	cam->WVP = model.World * cam->camView * cam->camProjection;
+	cbPerObj_gizmod.WVP = XMMatrixTranspose(cam->WVP);
+	cbPerObj_gizmod.World = XMMatrixTranspose(model.World);
+
+	for (int i = 0; i < model.Subsets; ++i) {
+		// Only draw the NON-transparent parts of the model. 
+		if (!material[model.SubsetMaterialID[i]].IsTransparent) {
+
+			cbPerObj_gizmod.color = color;
+
+			d3d->GetDeviceContext()->UpdateSubresource(d3d->cbPerObjectBuffer_gizmos, 0, NULL, &cbPerObj_gizmod, 0, 0);
+			d3d->GetDeviceContext()->VSSetConstantBuffers(0, 1, &d3d->cbPerObjectBuffer_gizmos);
+			d3d->GetDeviceContext()->PSSetConstantBuffers(1, 1, &d3d->cbPerObjectBuffer_gizmos);
+
+			// Draw the NON-transparent stuff
+			int indexStart = model.SubsetIndexStart[i];
+			int indexDrawAmount = model.SubsetIndexStart[i + 1] - indexStart;
+
+			d3d->GetDeviceContext()->DrawIndexed(indexDrawAmount, indexStart, 0);
+		}
+	}
+}
 
 void Model::Shutdown() {
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "core\pch.h"
+#include "Shader.h"
 #include "Model.h"
 
 namespace bpd {
@@ -19,11 +20,10 @@ namespace bpd {
 		Scene();
 		~Scene();
 
-		bool Initialize();
+		bool Initialize(Direct3D * d3d);
 		void Render(
-			ID3D11DeviceContext* DevCon,
-			Camera* cam,
-			ID3D11Buffer* cbPerObjectBuffer
+			Direct3D* d3d,
+			Camera* cam
 		);
 		void Update(double dt);
 		void Shutdown();
@@ -42,7 +42,14 @@ namespace bpd {
 
 	private:
 		cbPerObject				cbPerObj;
+		cbPerObject_gizmos		cbPerObj_gizmos;
+
 		std::vector<Model*>		models;
+		std::vector<Model*>		gizmos;
+		std::vector<Model*>		gizmos_boundingBox;
+
+		Shader		* shader;
+		Shader		* shader_gizmos;
 		float timer;
 	};
 }

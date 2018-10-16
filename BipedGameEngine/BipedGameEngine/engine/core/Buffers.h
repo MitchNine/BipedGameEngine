@@ -35,6 +35,13 @@ namespace bpd{
 		// 152 bytes
 	};
 
+	struct cbPerObject_gizmos {
+		DirectX::XMMATRIX WVP = DirectX::XMMATRIX();	// -- 64 -- 64
+		DirectX::XMMATRIX World = DirectX::XMMATRIX();	// -- 64 -- 128
+		DirectX::XMFLOAT4 color;						// -- 16 -- 144
+		// 144 bytes
+	};
+
 	struct cbPerFrame {
 		Light  light;	// -- 48 -- 48
 		// 48 bytes
