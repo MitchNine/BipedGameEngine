@@ -2,12 +2,12 @@
 using namespace bpd;
 
 Scene::Scene() {
-	models = std::vector<Model*>();
-	gizmos = std::vector<Model*>();
-	gizmos_boundingBox = std::vector<Model*>();
-	shader = new bpd::Shader;
-	shader_gizmos = new bpd::Shader;
-	timer = 0;
+	models				= std::vector<Model*>();
+	gizmos				= std::vector<Model*>();
+	gizmos_boundingBox	= std::vector<Model*>();
+	shader				= new bpd::Shader;
+	shader_gizmos		= new bpd::Shader;
+	timer				= 0;
 }
 Scene::~Scene() {}
 
@@ -66,8 +66,10 @@ bool Scene::Initialize(Direct3D * d3d) {
 }
 
 Model* Scene::AddModel(std::string path, ID3D11Device * device, IDXGISwapChain * swapChain) {
+	// Create a new model
 	Model *m = new Model;
 
+	// Get the model name and directory from the path
 	std::string dir, name;
 	int i = path.size() - 1;
 	for (; i > 0; i--) {
@@ -75,8 +77,13 @@ Model* Scene::AddModel(std::string path, ID3D11Device * device, IDXGISwapChain *
 			break;
 	}
 
+	// Set the directory for the path
 	dir = path.substr(0, i + 1);
+
+	// Set the name from the path
 	name = path.substr(i + 1, path.size() - 1);
+	
+	// Load the model from the .obj file
 	m->LoadObjModel(
 		device,
 		StringConverter::StringToWide(dir),
@@ -84,12 +91,12 @@ Model* Scene::AddModel(std::string path, ID3D11Device * device, IDXGISwapChain *
 		swapChain, true, true
 	);
 
+	// Add the model to the scene list
 	models.push_back(m);
 
+	// Add a new primitive shape to act as the bounding box of the object
 	Model *m_boundingBox = new Model;
-	m_boundingBox->LoadObjModel(device, L"Project\\Library\\Primitive\\", L"cube.obj", swapChain, true, true);
-	m_boundingBox->transform.position = m->transform.position;
-	m_boundingBox->transform.scail = m->model.AABB[1];
+	m_boundingBox->LoadObjModel(device, L"Project\\Library\\Primitive\\", L"cube.obj", swapChain, true, true,m->model.AABB);
 	gizmos_boundingBox.push_back(m_boundingBox);
 
 	return m;
@@ -100,8 +107,10 @@ Model* Scene::AddModel(
 	ID3D11Device* device,
 	IDXGISwapChain* swapChain
 ) {
+	// Create a new model
 	Model *model = new Model;
 
+	// Load in the correct primitive shape
 	switch (shape) {
 	case bpd::CONE:
 		model->LoadObjModel(device, L"Project\\Library\\Primitive\\", L"cone.obj", swapChain, true, true);
@@ -131,6 +140,7 @@ Model* Scene::AddModel(
 		break;
 	}
 
+	// add it to the gizmos scene
 	gizmos.push_back(model);
 
 	return model;
@@ -145,9 +155,14 @@ void Scene::Render(
 	Camera* cam
 ) {
 	// Set the shader for the models to use
+	// For the models we use a texture shader with shadows
 	shader->SetShader(d3d->GetDeviceContext());
 
+	// Set what type of rasterizer will be used in rendering this object
+	// For the models we use a rasterizer with no back face culling
 	d3d->SetRasterizerState(Direct3D::eRSCullNone);
+
+	// Loop through all models in the scene and render them
 	for (int i = 0; i < models.size(); i++) {
 		models[i]->Render(
 			d3d,				// Pointer to direct 3D
@@ -158,9 +173,15 @@ void Scene::Render(
 		);
 	}
 
+	// Set the shader for the models to use
+	// For the gizmo's we use a solid color shader
 	shader_gizmos->SetShader(d3d->GetDeviceContext());
 
+	// Set what type of rasterizer will be used in rendering this object
+	// For the gizmo's we use a rasterizer with no back face culling
 	d3d->SetRasterizerState(Direct3D::eRSCullNone);
+
+	// Loop through all models in the gizmos scene and render them
 	for (int i = 0; i < gizmos.size(); i++) {
 		gizmos[i]->Render_gizmos(
 			d3d,				// Pointer to direct 3D
@@ -172,7 +193,11 @@ void Scene::Render(
 		);
 	}
 
+	// Set what type of rasterizer will be used in rendering this object
+	// For the bounding boxes we use a wire fame rasterizer
 	d3d->SetRasterizerState(Direct3D::eRSCullNoneWF);
+	
+	// Loop through all gizmos bounding boxes and render them
 	for (int i = 0; i < gizmos_boundingBox.size(); i++) {
 		gizmos_boundingBox[i]->Render_gizmos(
 			d3d,				// Pointer to direct 3D
@@ -180,10 +205,11 @@ void Scene::Render(
 			sizeof(bpd::Vertex),// Vertex stride
 			0,					// Vertex offset
 			cbPerObj_gizmos,	// Reference to the pre object struct
-			DirectX::XMFLOAT4(0, 1, 0, 1) // Color
+			DirectX::XMFLOAT4(0.3f, 0.3f,0.3f, 1) // Color
 		);
 	}
 }
+
 
 void Scene::Update(double dt) {
 	timer += 0.01f;
@@ -193,8 +219,13 @@ void Scene::Update(double dt) {
 	for (int i = 0; i < gizmos.size(); i++)
 		gizmos[i]->Update();
 
-	for (int i = 0; i < gizmos_boundingBox.size(); i++)
+	for (int i = 0; i < gizmos_boundingBox.size(); i++) {
+		gizmos_boundingBox[i]->transform.position = models[i]->transform.position;
+		gizmos_boundingBox[i]->transform.rotation = models[i]->transform.rotation;
+		gizmos_boundingBox[i]->transform.scail = models[i]->transform.scail;
+
 		gizmos_boundingBox[i]->Update();
+	}
 
 }
 

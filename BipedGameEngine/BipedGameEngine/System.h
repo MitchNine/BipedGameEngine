@@ -10,14 +10,21 @@ namespace bpd{
 		System();
 		~System();
 
+		// Initialize the all the systems within this application
 		bool Initialize(HINSTANCE hInstance);
+		// Clear all pointers within this application
 		void Shutdown();
+		// Update all objects within this application
 		void Update(double deltaTime);
+		// Render all objects within this application
 		void Render();
+		// This is the update loop for this application
 		int MessageLoop();
 
 	public:
+		// Static instance of this system for access outside
 		static System* instance;
+		// Returns the Direct3D class, this handles all the DirectX 11 setup
 		inline Direct3D * GetDirect3D() { return direct3D; }
 
 	private:

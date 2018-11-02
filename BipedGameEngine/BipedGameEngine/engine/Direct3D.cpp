@@ -62,8 +62,8 @@ bool Direct3D::Initialize(
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 	ZeroMemory(&swapChainDesc,sizeof(DXGI_SWAP_CHAIN_DESC));
 	swapChainDesc.BufferDesc			= bufferDesc;
-	swapChainDesc.SampleDesc.Count		= 4;
-	swapChainDesc.SampleDesc.Quality	= 4;
+	swapChainDesc.SampleDesc.Count		= 1;
+	swapChainDesc.SampleDesc.Quality	= 0;
 	swapChainDesc.BufferUsage			= DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.BufferCount			= 1;
 	swapChainDesc.OutputWindow			= hwnd;
@@ -82,7 +82,7 @@ bool Direct3D::Initialize(
 	};
 	UINT numFeatureLevels = ARRAYSIZE(featureLevels);
 
-	// Create our Direct3D 11 Device and SwapChain
+	// Create our Direct3D 11 Device and SwapChain using the correct feature level for the device
 	if(FAILED(D3D11CreateDeviceAndSwapChain(NULL,D3D_DRIVER_TYPE_HARDWARE,NULL,D3D11_CREATE_DEVICE_DEBUG,featureLevels,numFeatureLevels,D3D11_SDK_VERSION,&swapChainDesc,&SwapChain,&d3d11Device,&featureD11_1,&d3d11DevCon)))
 		if(FAILED(D3D11CreateDeviceAndSwapChain(NULL,D3D_DRIVER_TYPE_HARDWARE,NULL,D3D11_CREATE_DEVICE_DEBUG,featureLevels,numFeatureLevels,D3D11_SDK_VERSION,&swapChainDesc,&SwapChain,&d3d11Device,&featureD11_0,&d3d11DevCon)))
 			if(FAILED(D3D11CreateDeviceAndSwapChain(NULL,D3D_DRIVER_TYPE_HARDWARE,NULL,D3D11_CREATE_DEVICE_DEBUG,featureLevels,numFeatureLevels,D3D11_SDK_VERSION,&swapChainDesc,&SwapChain,&d3d11Device,&featureD10_1,&d3d11DevCon)))
@@ -164,13 +164,6 @@ bool Direct3D::Initialize(
 	light.ambient = DirectX::XMFLOAT4(0.2f,0.2f,0.2f,1.0f);
 	light.diffuse = DirectX::XMFLOAT4(1.0f,1.0f,1.0f,1.0f);
 
-	return true;
-}
-
-bool Direct3D::InitializeBuffers(){
-	if (!CreateViewPort())		return false;
-	if (!CreateCBuffer())		return false;
-	if (!CreateSampleState())	return false;
 	return true;
 }
 
@@ -355,11 +348,20 @@ bool Direct3D::CreateSampleState(){
 	cmdesc.CullMode					= D3D11_CULL_BACK;
 	cmdesc.FrontCounterClockwise	= true;
 	cmdesc.MultisampleEnable		= true;
+
+	// Set the rasterizer state
+	// - FillMode				= FILL_SOLID
+	// - CullMode				= CULL_BACK
+	// - FrontCounterClockwise	= true
 	if(FAILED(d3d11Device->CreateRasterizerState(&cmdesc,&CCWcullMode)))
 		return false;
 
 	cmdesc.FrontCounterClockwise = false;
 
+	// Set the rasterizer state
+	// - FillMode				= FILL_SOLID
+	// - CullMode				= CULL_BACK
+	// - FrontCounterClockwise	= false
 	if(FAILED(d3d11Device->CreateRasterizerState(&cmdesc,&CWcullMode)))
 		return false;
 
@@ -367,11 +369,19 @@ bool Direct3D::CreateSampleState(){
 		cmdesc.FillMode = D3D11_FILL_WIREFRAME;
 	cmdesc.CullMode		= D3D11_CULL_NONE;
 
+	// Set the rasterizer state
+	// - FillMode				= FILL_SOLID
+	// - CullMode				= CULL_NONE
+	// - FrontCounterClockwise	= false
 	if(FAILED(d3d11Device->CreateRasterizerState(&cmdesc,&RSCullNone)))
 		return false;
 
 	cmdesc.FillMode = D3D11_FILL_WIREFRAME;
 
+	// Set the rasterizer state
+	// - FillMode				= FILL_WIREFRAME
+	// - CullMode				= CULL_NONE
+	// - FrontCounterClockwise	= false
 	if (FAILED(d3d11Device->CreateRasterizerState(&cmdesc, &RSCullNoneWF)))
 		return false;
 

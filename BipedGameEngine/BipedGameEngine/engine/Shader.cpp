@@ -1,14 +1,18 @@
 #include "Shader.h"
 using namespace bpd;
 
-
 void PrintCompileErrorMessages(ID3DBlob* errors) {
+	// Print the compile error message into a message box
 	MessageBox(0,(WCHAR *)errors->GetBufferPointer(),L"Error",MB_OK | MB_ICONERROR);
 }
 
 HRESULT CompileShader(const WCHAR *filename,const char *entrypoint,const char *profile,ID3DBlob **out_code) {
 	ID3DBlob *errors;
+
+	// Compile the shader
 	HRESULT hresult = D3DCompileFromFile(filename,0,0,entrypoint,profile,D3DCOMPILE_DEBUG,0,out_code,&errors);
+	
+	// If compile failed, print the error out into a message box
 	if(hresult != S_OK) {
 		PrintCompileErrorMessages(errors);
 	}
@@ -39,7 +43,7 @@ bool Shader::Initialize(
 ){
 	ID3DBlob *errors;
 
-	// Compile Shaders from shader file
+	// Compile vertex shader from shader file
 	result = D3DCompileFromFile(
 		StringConverter::StringToWide(vs_path).c_str(),
 		0,0,vs_entry.c_str(),"vs_4_0",D3DCOMPILE_DEBUG,0,&VS_Buffer,&errors);
@@ -48,6 +52,7 @@ bool Shader::Initialize(
 		return false;
 	}
 
+	// Compile pixel shader from shader file
 	result = D3DCompileFromFile(
 		StringConverter::StringToWide(ps_path).c_str(),
 		0,0,ps_entry.c_str(),"ps_4_0",D3DCOMPILE_DEBUG,0,&PS_Buffer,&errors);
@@ -91,7 +96,7 @@ bool Shader::Initialize(
 ) {
 	ID3DBlob *errors;
 
-	// Compile Shaders from shader file
+	// Compile vertex shader from shader file
 	result = D3DCompileFromFile(
 		L"Project\\Library\\Shaders\\Effects.fx",
 		0, 0, "VS", "vs_4_0", D3DCOMPILE_DEBUG, 0, &VS_Buffer, &errors);
@@ -100,6 +105,7 @@ bool Shader::Initialize(
 		return false;
 	}
 
+	// Compile pixel shader from shader file
 	result = D3DCompileFromFile(
 		L"Project\\Library\\Shaders\\Effects.fx",
 		0, 0, "PS", "ps_4_0", D3DCOMPILE_DEBUG, 0, &PS_Buffer, &errors);

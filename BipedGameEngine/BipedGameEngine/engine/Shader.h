@@ -7,6 +7,7 @@ namespace bpd{
 		Shader();
 		~Shader();
 
+		// Initialize and compile the shader
 		bool Initialize(
 			std::string vs_path,
 			std::string vs_entry,
@@ -17,11 +18,16 @@ namespace bpd{
 			ID3D11Device				* d3d11Device,
 			ID3D11DeviceContext			* d3d11DevCon
 		);
+		// Initialize and compile a default shader
 		bool Initialize(
 			ID3D11Device				* d3d11Device,
 			ID3D11DeviceContext			* d3d11DevCon
 		);
+
+		// Clear all pointers
 		void Shutdown();
+		
+		// Bind the shader
 		void SetShader(ID3D11DeviceContext * d3d11DevCon);
 
 	private:
